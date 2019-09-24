@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import {
   StyleSheet,
-  TouchableHighlight,
+  TouchableHighlight, Platform,
   Alert, KeyboardAvoidingView, AsyncStorage, FlatList, ActivityIndicator
 } from 'react-native';
 import { Container, Header, Title, Form, Text, Content, Item, Label, Picker,Textarea, Input, Icon, List, View, ListItem, Left, Thumbnail, Image, Body, Right,  Fab, Button  } from 'native-base';
@@ -9,6 +9,7 @@ import Moment from 'moment';
 import { OkulApi } from '../services/OkulApiService';
 import  ImageBrowser  from '../components/ImageBrowser';
 import { NotifyReceiversScreen } from './NotifyReceiversScreen';
+import { FileSystem, Asset } from 'expo';
 
 export class NotificationScreen extends React.Component {
   
@@ -19,7 +20,8 @@ export class NotificationScreen extends React.Component {
       message:'',
       selectedImages:null,
       imageBrowserOpen: false,
-      photos: [],      
+      photos: [],
+      photosTypes: [],
       assetType:'Photos',
       notifyReceiverOpen:false,
       receivers:[],
@@ -42,10 +44,29 @@ export class NotificationScreen extends React.Component {
   imageBrowserCallback = (callback) => {
     callback.then((photos) => {    
       let newList = this.state.photos;
-      newList = newList.concat(photos);
+      let newListTypes = this.state.photosTypes;
+      
+      for (const key in photos) {
+        if (photos.hasOwnProperty(key)) {
+          const element = photos[key];
+          FileSystem.downloadAsync(element.uri).then((uri)=>{
+            console.log(uri);
+            FileSystem.readAsStringAsync(uri).then((res)=>{
+              element.b64 = res;
+              newList.push(element);
+              newListTypes.push(this.state.assetType == 'Photos' ? 'image/jpeg' : 'video/mp4');
+            });
+          });
+
+        }
+      }
+      
+      console.log(newList);
+
       this.setState({
         imageBrowserOpen: false,
         photos:newList,
+        photosTypes:newListTypes,
       });
     }).catch((e) => console.log(e))
   }  
@@ -94,8 +115,18 @@ export class NotificationScreen extends React.Component {
     if(this.state.message.length == 0){
       Alert.alert('HATA', 'Mesaj yazınız.');
       return;
-    }    
+    }
     this.setState({isSending:true});
+
+    for (const key in this.state.photos) {
+      if (this.state.photos.hasOwnProperty(key)) {
+        const element = this.state.photos[key];
+        OkulApi.uploadImageFile(element, Platform, (res)=>{
+          console.log(res);
+        });
+      }
+    }
+
     setTimeout(()=>{
       this.setState({isSending:false});
     },5000);

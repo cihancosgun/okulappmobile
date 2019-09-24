@@ -14,8 +14,6 @@
     "@fortawesome/free-solid-svg-icons": "^5.10.0",
     "@fortawesome/react-native-fontawesome": "^0.1.0",
     "expo": "^31.0.6",
-    "expo-asset": "^1.1.1",
-    "expo-file-system": "^1.1.0",
     "expo-font": "^1.1.0",
     "moment": "^2.24.0",
     "native-base": "^2.13.8",

@@ -12,10 +12,10 @@ export class OkulApi extends React.Component {
         super(props);
     }
 
-    // static apiURL = "http://172.16.121.31:8080/OkulApp-web/webresources/api/";
-    // static wsURL = "http://172.16.121.31:8080/OkulApp-web/ws";
-    static apiURL = "http:/192.168.134.36:8080/OkulApp-web/webresources/api/";
-    static wsURL = "http://192.168.134.36:8080/OkulApp-web/ws";
+    static apiURL = "http://172.16.121.31:8080/OkulApp-web/webresources/api/";
+    static wsURL = "http://172.16.121.31:8080/OkulApp-web/ws";
+    // static apiURL = "http:/192.168.134.36:8080/OkulApp-web/webresources/api/";
+    // static wsURL = "http://192.168.134.36:8080/OkulApp-web/ws";
 
     static ws = null;
 
@@ -389,25 +389,24 @@ export class OkulApi extends React.Component {
         return result;
     }
 
-    static uploadImageFile(fileUri, fileName, type, successCalback, errroCallBack) {
-        const form = new FormData();
-        form.append('file', {
-            uri: fileUri,
-            type: type,
-            name: fileName,
-          });
-
+    static uploadImageFile(photo, Platform, successCalback, errroCallBack) {       
         this.refreshToken().then(() => {
             fetch(this.apiURL + 'uploadImageFile', {
                     method: 'POST',
                     headers: {
                         Accept: 'application/json;charset=UTF-8',
-                        'Content-Type': 'multipart/form-data;',
-                        'Authorization': OkulApi.token
+                        'Content-Type': 'application/json;charset=UTF-8',
                     },
-                    body: formBody
-                }).then((response) => response.json())
+                    body: form
+                }).then((response) => {
+                    console.log(response);
+                    response.json();                    
+                }
+                ).catch((res)=>{
+                    console.log(res);
+                })
                 .then((response) => {
+                    console.log(response);
                     if (successCalback != null) {
                         successCalback(response);
                     } else {
