@@ -19,6 +19,7 @@ import { ChatSubScreen } from './views/ChatSubScreen';
 import { OkulApi } from './services/OkulApiService';
 import { ContactsScreen } from './views/ContactsScreen';
 import { NotificationScreen } from './views/NotificationScreen';
+import { NotifyReceiversScreen } from './views/NotifyReceiversScreen';
 
 class AuthLoadingScreen extends React.Component {
   constructor(props) {
@@ -136,6 +137,7 @@ const AppStack = createBottomTabNavigator({ Home: HomeScreen, Chat:ChatScreen, M
 const GalleryStack = createStackNavigator({ Gallery: GalleryScreen }, {defaultNavigationOptions: {   header: null }});
 const ChatSubStack = createStackNavigator({ ChatSub: ChatSubScreen }, {defaultNavigationOptions: {   header: null }});
 const ContactsStack = createStackNavigator({ ContactsStack: ContactsScreen }, {defaultNavigationOptions: {   header: null }});
+const NotifyReceiverStack = createStackNavigator({ NotifyReceiver: NotifyReceiversScreen }, {defaultNavigationOptions: {   header: null }});
 const AuthStack = createStackNavigator({ SignIn: LoginView }, {defaultNavigationOptions: {   header: null }});
 const NotifyStack = createStackNavigator({ Notify: NotificationScreen }, {defaultNavigationOptions: {   header: null }});
 
@@ -148,6 +150,7 @@ export default createAppContainer(createSwitchNavigator(
     ChatSub: ChatSubStack,
     Contacts: ContactsStack,
     Notify: NotifyStack,
+    NotifyReceiver: NotifyReceiverStack,
   },
   {
     initialRouteName: 'AuthLoading',

@@ -60,7 +60,7 @@ export class ContactsScreen extends React.Component {
       var newState= {isFetchingB:false, studentParents:[]};
       thiz.setState(newState);
     });
-  },200);
+  },300);
       setTimeout(()=>{
       OkulApi.getStuffs(thiz.state != null ? thiz.state.search : '', (result)=>{
         var newState= {isFetchingC:false, stuffs:result};
@@ -69,7 +69,7 @@ export class ContactsScreen extends React.Component {
         var newState= {isFetchingC:false, stuffs:[]};
         thiz.setState(newState);
       });
-    },200);
+    },400);
   }
 
   startNewChat(thiz, receiver){
