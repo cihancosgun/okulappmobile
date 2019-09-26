@@ -194,6 +194,31 @@ export class OkulApi extends React.Component {
         });
     }
 
+    static getStudentParentsOfClass(classId, successCalback, errroCallBack) {
+        this.refreshToken().then(() => {
+            fetch(this.apiURL + 'getStudentParentsOfClass?classId=' + classId.$oid, {
+                    method: 'GET',
+                    headers: {
+                        Accept: 'application/json;charset=UTF-8',
+                        'Content-Type': 'application/json;charset=UTF-8',
+                        'Authorization': OkulApi.token
+                    }
+                }).then((response) => response.json())
+                .catch((res) => {
+                    console.log(res)
+                })
+                .then((response) => {
+                    if (response.result != null && successCalback != null) {
+                        successCalback(response.result);
+                    } else {
+                        if (errroCallBack != null) {
+                            errroCallBack();
+                        }
+                    }
+                });
+        });
+    }
+
     static getStuffs(search, successCalback, errroCallBack) {
         this.refreshToken().then(() => {
             fetch(this.apiURL + 'getStuffs?searchText=' + search, {
@@ -389,26 +414,54 @@ export class OkulApi extends React.Component {
         return result;
     }
 
-    static uploadImageFile(photo, Platform, successCalback, errroCallBack) {       
+    static uploadImageFile(photo, Platform, successCalback, errroCallBack) {
         this.refreshToken().then(() => {
             fetch(this.apiURL + 'uploadImageFile', {
                     method: 'POST',
                     headers: {
                         Accept: 'application/json;charset=UTF-8',
                         'Content-Type': 'application/json;charset=UTF-8',
+                        'Authorization': OkulApi.token
                     },
-                    body: form
+                    body: JSON.stringify({
+                        base64: photo.b64,
+                        mimeType: photo.mimeType
+                    })
                 }).then((response) => {
-                    console.log(response);
-                    response.json();                    
-                }
-                ).catch((res)=>{
-                    console.log(res);
-                })
-                .then((response) => {
-                    console.log(response);
+                    const jsonBody = JSON.parse(response._bodyText);
                     if (successCalback != null) {
-                        successCalback(response);
+                        successCalback(jsonBody);
+                    } else {
+                        if (errroCallBack != null) {
+                            errroCallBack();
+                        }
+                    }
+                });
+        });
+    }
+
+    static insertNotifyMessage(notifyState, successCalback, errroCallBack) {
+        this.refreshToken().then(() => {
+            var record = {
+                "messageType": notifyState.messageType,
+                "receivers": notifyState.receiverUsers,
+                "receiversNS": notifyState.receiverNS,
+                "message": notifyState.message,
+                "fileIds": notifyState.fileIds,
+                "thumbFileIds": notifyState.thumbFileIds,
+            };
+            fetch(this.apiURL + 'insertNotifyMessage', {
+                    method: 'POST',
+                    headers: {
+                        Accept: 'application/json;charset=UTF-8',
+                        'Content-Type': 'application/json;charset=UTF-8',
+                        'Authorization': OkulApi.token
+                    },
+                    body: JSON.stringify(record),
+                }).then((response) => response.json())
+                .then((response) => {
+                    if (response.result && successCalback != null) {
+                        successCalback(response.result);
                     } else {
                         if (errroCallBack != null) {
                             errroCallBack();

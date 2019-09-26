@@ -9,7 +9,7 @@ import Moment from 'moment';
 import { OkulApi } from '../services/OkulApiService';
 import  ImageBrowser  from '../components/ImageBrowser';
 import { NotifyReceiversScreen } from './NotifyReceiversScreen';
-import { FileSystem, Asset } from 'expo';
+import { FileSystem, Asset, Permissions } from 'expo';
 
 export class NotificationScreen extends React.Component {
   
@@ -25,7 +25,12 @@ export class NotificationScreen extends React.Component {
       assetType:'Photos',
       notifyReceiverOpen:false,
       receivers:[],
+      receiverUsers:[],
+      receiverNS:[],
       isSending:false,
+      fileIds : [],
+      thumbFileIds : [],
+      status:'',
     }
   }
 
@@ -34,7 +39,8 @@ export class NotificationScreen extends React.Component {
   };
 
   async componentDidMount() { 
-    Moment.locale('tr');
+    Moment.locale('tr');    
+    Permissions.askAsync(Permissions.CAMERA_ROLL).then(d => console.log(d));
   }
 
   back() {
@@ -42,42 +48,64 @@ export class NotificationScreen extends React.Component {
   }
 
   imageBrowserCallback = (callback) => {
-    callback.then((photos) => {    
+    callback.then((photos) => {
       let newList = this.state.photos;
       let newListTypes = this.state.photosTypes;
-      
+      if(photos.length == 0){
+        this.setState({
+          imageBrowserOpen: false,
+          photos:newList,
+          photosTypes:newListTypes,
+        });
+      }      
       for (const key in photos) {
         if (photos.hasOwnProperty(key)) {
           const element = photos[key];
-          FileSystem.downloadAsync(element.uri).then((uri)=>{
-            console.log(uri);
-            FileSystem.readAsStringAsync(uri).then((res)=>{
-              element.b64 = res;
-              newList.push(element);
-              newListTypes.push(this.state.assetType == 'Photos' ? 'image/jpeg' : 'video/mp4');
+          const newFileName = FileSystem.documentDirectory + key + '.jpg';
+          FileSystem.copyAsync({
+            from: element.file,
+            to: newFileName
+          }).then((res) => {
+            FileSystem.readAsStringAsync(newFileName, {
+              encoding: FileSystem.EncodingTypes.Base64
+            }).then((res) => {
+              const fileToUpload = {
+                b64: res,
+                mimeType: this.state.assetType == 'Photos' ? 'image/jpeg' : 'video/mp4'
+              };
+              OkulApi.uploadImageFile(fileToUpload, Platform, (res) => {
+                if (res.fileId != null) {
+                  this.state.fileIds.push(res.fileId);
+                  this.state.thumbFileIds.push(res.thumbFileId);
+                  this.state.imageBrowserOpen = false;
+                  newList.push(element);
+                  this.state.photos = newList;
+                  this.setState(this.state);
+                }
+              }, (error) => {
+                Alert.alert('Hata', 'Dosya gönderilirken bir hata oluştu.');
+              });
+              FileSystem.deleteAsync(newFileName);
             });
           });
 
         }
-      }
-      
-      console.log(newList);
-
-      this.setState({
-        imageBrowserOpen: false,
-        photos:newList,
-        photosTypes:newListTypes,
-      });
+        }
     }).catch((e) => console.log(e))
   }  
 
   selectedReceivers(state){
     this.state.receivers = [];
+    this.state.receiverUsers = [];
+    this.state.receiverNS = [];
     for (const key in state.teachers) {
       if (state.teachers.hasOwnProperty(key)) {
         const element = state.teachers[key];
         if(element.selected){
           this.state.receivers.push({type:'teacher', _id: element._id});
+          this.state.receiverUsers.push(element.email);
+          this.state.receiverNS.push(element.nameSurname);
+          this.setState(this.state);
         }
       }
     }
@@ -87,6 +115,9 @@ export class NotificationScreen extends React.Component {
         const element = state.stuffs[key];
         if(element.selected){
           this.state.receivers.push({type:'stuff', _id: element._id});
+          this.state.receiverUsers.push(element.email);
+          this.state.receiverNS.push(element.nameSurname);
+          this.setState(this.state);
         }
       }
     }
@@ -96,11 +127,18 @@ export class NotificationScreen extends React.Component {
         const element = state.classes[key];
         if(element.selected){
           this.state.receivers.push({type:'class', _id: element._id});
+          OkulApi.getStudentParentsOfClass(element._id,(res)=>{
+            res.forEach(element => {
+              this.state.receiverUsers.push(element.email);
+              this.state.receiverNS.push(element.nameSurname);
+              this.setState(this.state);
+            });
+          });
         }
       }
     }
 
-    this.setState({notifyReceiverOpen:false, receivers: this.state.receivers});
+    this.setState({notifyReceiverOpen:false});
   }
 
   selectReceivers(){
@@ -116,20 +154,23 @@ export class NotificationScreen extends React.Component {
       Alert.alert('HATA', 'Mesaj yazınız.');
       return;
     }
-    this.setState({isSending:true});
+    this.setState({isSending:true, status: 'Gönderiliyor..'});
+
+    OkulApi.insertNotifyMessage(this.state, (res)=>{
+      this.setState({isSending:false});
+      Alert.alert('Başarılı', 'Duyuru gönderildi.');
+      this.props.navigation.navigate('Menu');
+    },(error)=>{
+      Alert.alert('Hata', 'Duyuru gönderilirken bir hata oluştu.');
+    });
+
 
     for (const key in this.state.photos) {
       if (this.state.photos.hasOwnProperty(key)) {
-        const element = this.state.photos[key];
-        OkulApi.uploadImageFile(element, Platform, (res)=>{
-          console.log(res);
-        });
+        const element = this.state.photos[key];               
+        
       }
     }
-
-    setTimeout(()=>{
-      this.setState({isSending:false});
-    },5000);
   }
  
   render() {    
@@ -137,7 +178,7 @@ export class NotificationScreen extends React.Component {
       return (
         <View style={[styles.container, styles.horizontal]}>
           <ActivityIndicator size="large" color="#0000ff" />
-          <Text>Duyuru Gönderiliyor..</Text>
+          <Text>{this.state.status}</Text>
         </View>);
     }
     if(this.state.notifyReceiverOpen){
@@ -191,10 +232,7 @@ export class NotificationScreen extends React.Component {
             <Item>
             <Text>{this.state.photos.length} adet resim/video seçili.   </Text>
               <Button rounded onPress={() => {this.setState({imageBrowserOpen: true, assetType:'Photos'})}}>
-                  <Text>Resim</Text>
-              </Button>
-              <Button rounded onPress={() => {this.setState({imageBrowserOpen: true, assetType:'Videos'})}}>
-                  <Text>Video</Text>
+                  <Text>Seç</Text>
               </Button>
             </Item>
             <KeyboardAvoidingView style={{ flex: 1 }} behavior="padding" enabled>
