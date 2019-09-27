@@ -36,7 +36,7 @@ export class MenuScreen extends React.Component {
               <Text>Duygu Durumu</Text>
             </Button>
             <View></View>
-            <Button style={styles.button} block light>
+            <Button style={styles.button} block light onPress={()=>{this.props.navigation.navigate('MonthlyMeal');}}>
               <Icon name='calendar' />
               <Text>Yemek Takvimi</Text>
             </Button>

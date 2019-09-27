@@ -24,6 +24,7 @@ import { StudentsCheckIn } from './views/StudentsCheckIn';
 import { StudentsActivityMealScreen } from './views/StudentsActivityMealScreen';
 import { StudentsActivitySleepScreen } from './views/StudentsActivitySleepScreen';
 import { StudentsActivityEmotionScreen } from './views/StudentsActivityEmotionScreen';
+import { MonthlyMealScheduleScreen } from './views/MonthlyMealScheduleScreen';
 
 class AuthLoadingScreen extends React.Component {
   constructor(props) {
@@ -148,6 +149,7 @@ const StudentsCheckInStack = createStackNavigator({ StudentsCheckInStack: Studen
 const StudentsActivityMealStack = createStackNavigator({ StudentsActivityMealStack: StudentsActivityMealScreen }, {defaultNavigationOptions: {   header: null }});
 const StudentsActivitySleepStack = createStackNavigator({ StudentsActivitySleepStack: StudentsActivitySleepScreen }, {defaultNavigationOptions: {   header: null }});
 const StudentsActivityEmotionStack = createStackNavigator({ StudentsActivityEmotionStack: StudentsActivityEmotionScreen }, {defaultNavigationOptions: {   header: null }});
+const MonthlyMealScheduleStack = createStackNavigator({ MonthlyMealScheduleStack: MonthlyMealScheduleScreen }, {defaultNavigationOptions: {   header: null }});
 
 export default createAppContainer(createSwitchNavigator(
   {
@@ -163,6 +165,7 @@ export default createAppContainer(createSwitchNavigator(
     StMeal:StudentsActivityMealStack,
     StSleep:StudentsActivitySleepStack,
     StEmotion:StudentsActivityEmotionStack,
+    MonthlyMeal:MonthlyMealScheduleStack,
   },
   {
     initialRouteName: 'AuthLoading',

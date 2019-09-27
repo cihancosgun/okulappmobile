@@ -655,6 +655,31 @@ export class OkulApi extends React.Component {
         });
     }
 
+    static getFoodCalendar(month, successCalback, errroCallBack) {
+        this.refreshToken().then(() => {
+            fetch(this.apiURL + 'getFoodCalendar?month=' + month, {
+                    method: 'GET',
+                    headers: {
+                        Accept: 'application/json;charset=UTF-8',
+                        'Content-Type': 'application/json;charset=UTF-8',
+                        'Authorization': OkulApi.token
+                    }
+                }).then((response) => response.json() )
+                .catch((res) => {
+                    console.log(res)
+                })
+                .then((response) => {
+                    if (response.result != null && successCalback != null) {
+                        successCalback(response.result);
+                    } else {
+                        if (errroCallBack != null) {
+                            errroCallBack();
+                        }
+                    }
+                });
+        });
+    }
+
     static initWS() {
         this.ws = new WebSocket(this.wsURL);
         this.ws.onopen = () => {
