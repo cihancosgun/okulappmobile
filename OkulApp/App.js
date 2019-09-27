@@ -20,6 +20,10 @@ import { OkulApi } from './services/OkulApiService';
 import { ContactsScreen } from './views/ContactsScreen';
 import { NotificationScreen } from './views/NotificationScreen';
 import { NotifyReceiversScreen } from './views/NotifyReceiversScreen';
+import { StudentsCheckIn } from './views/StudentsCheckIn';
+import { StudentsActivityMealScreen } from './views/StudentsActivityMealScreen';
+import { StudentsActivitySleepScreen } from './views/StudentsActivitySleepScreen';
+import { StudentsActivityEmotionScreen } from './views/StudentsActivityEmotionScreen';
 
 class AuthLoadingScreen extends React.Component {
   constructor(props) {
@@ -140,6 +144,10 @@ const ContactsStack = createStackNavigator({ ContactsStack: ContactsScreen }, {d
 const NotifyReceiverStack = createStackNavigator({ NotifyReceiver: NotifyReceiversScreen }, {defaultNavigationOptions: {   header: null }});
 const AuthStack = createStackNavigator({ SignIn: LoginView }, {defaultNavigationOptions: {   header: null }});
 const NotifyStack = createStackNavigator({ Notify: NotificationScreen }, {defaultNavigationOptions: {   header: null }});
+const StudentsCheckInStack = createStackNavigator({ StudentsCheckInStack: StudentsCheckIn }, {defaultNavigationOptions: {   header: null }});
+const StudentsActivityMealStack = createStackNavigator({ StudentsActivityMealStack: StudentsActivityMealScreen }, {defaultNavigationOptions: {   header: null }});
+const StudentsActivitySleepStack = createStackNavigator({ StudentsActivitySleepStack: StudentsActivitySleepScreen }, {defaultNavigationOptions: {   header: null }});
+const StudentsActivityEmotionStack = createStackNavigator({ StudentsActivityEmotionStack: StudentsActivityEmotionScreen }, {defaultNavigationOptions: {   header: null }});
 
 export default createAppContainer(createSwitchNavigator(
   {
@@ -151,6 +159,10 @@ export default createAppContainer(createSwitchNavigator(
     Contacts: ContactsStack,
     Notify: NotifyStack,
     NotifyReceiver: NotifyReceiverStack,
+    StCheckIn:StudentsCheckInStack,
+    StMeal:StudentsActivityMealStack,
+    StSleep:StudentsActivitySleepStack,
+    StEmotion:StudentsActivityEmotionStack,
   },
   {
     initialRouteName: 'AuthLoading',

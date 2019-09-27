@@ -42,7 +42,7 @@ export class NotifyReceiversScreen extends React.Component {
   }
 
   loadList(thiz){
-    setTimeout(()=>{
+    // setTimeout(()=>{
       OkulApi.getTeachers(thiz.state != null ? thiz.state.search : '', (result)=>{
         var newState= {isFetchingA:false, teachers:result};
         thiz.setState(newState);
@@ -50,9 +50,9 @@ export class NotifyReceiversScreen extends React.Component {
         var newState= {isFetchingA:false, teachers:[]};
         thiz.setState(newState);
       });
-    },200);
+    // },10);
      
-    setTimeout(()=>{
+    // setTimeout(()=>{
     OkulApi.getClasses(thiz.state != null ? thiz.state.search : '', (result)=>{
       var newState= {isFetchingB:false, classes:result};
       thiz.setState(newState);
@@ -60,9 +60,9 @@ export class NotifyReceiversScreen extends React.Component {
       var newState= {isFetchingB:false, classes:[]};
       thiz.setState(newState);
     });
-  },300);
+  // },10);
 
-      setTimeout(()=>{
+      // setTimeout(()=>{
       OkulApi.getStuffs(thiz.state != null ? thiz.state.search : '', (result)=>{
         var newState= {isFetchingC:false, stuffs:result};
         thiz.setState(newState);
@@ -70,7 +70,7 @@ export class NotifyReceiversScreen extends React.Component {
         var newState= {isFetchingC:false, stuffs:[]};
         thiz.setState(newState);
       });
-    },400);
+    // },10);
   }
  
   selectItem(data,index,role,thiz){
@@ -86,9 +86,9 @@ export class NotifyReceiversScreen extends React.Component {
 
   renderItem(data, idx, role, thiz){
         return (
-        <ListItem avatar>
+        <ListItem avatar onPress={() => { thiz.selectItem(data, data.index, role, thiz) }}>
           <Left>
-            <CheckBox onPress={() => { thiz.selectItem(data, data.index, role, thiz) }} checked={data.item.selected} />
+            <CheckBox checked={data.item.selected} />
           </Left>
           <Body>
             <Text>{data.item.name != null ? data.item.name :  data.item.nameSurname}</Text>

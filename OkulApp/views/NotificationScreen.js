@@ -31,6 +31,7 @@ export class NotificationScreen extends React.Component {
       fileIds : [],
       thumbFileIds : [],
       status:'',
+      isFilesUploading:false,
     }
   }
 
@@ -47,51 +48,46 @@ export class NotificationScreen extends React.Component {
     this.props.navigation.navigate('Menu');
   }
 
-  imageBrowserCallback = (callback) => {
-    callback.then((photos) => {
+  imageBrowserCallback = async (callback) => {
+    let photos = await callback;
+    this.setState({
+      imageBrowserOpen: false,
+    });
+
+    if(photos != null) {
       let newList = this.state.photos;
-      let newListTypes = this.state.photosTypes;
       if(photos.length == 0){
         this.setState({
           imageBrowserOpen: false,
           photos:newList,
-          photosTypes:newListTypes,
+          isFilesUploading:false,
         });
-      }      
-      for (const key in photos) {
-        if (photos.hasOwnProperty(key)) {
-          const element = photos[key];
-          const newFileName = FileSystem.documentDirectory + key + '.jpg';
-          FileSystem.copyAsync({
-            from: element.file,
-            to: newFileName
-          }).then((res) => {
-            FileSystem.readAsStringAsync(newFileName, {
-              encoding: FileSystem.EncodingTypes.Base64
-            }).then((res) => {
-              const fileToUpload = {
-                b64: res,
-                mimeType: this.state.assetType == 'Photos' ? 'image/jpeg' : 'video/mp4'
-              };
-              OkulApi.uploadImageFile(fileToUpload, Platform, (res) => {
-                if (res.fileId != null) {
-                  this.state.fileIds.push(res.fileId);
-                  this.state.thumbFileIds.push(res.thumbFileId);
-                  this.state.imageBrowserOpen = false;
-                  newList.push(element);
-                  this.state.photos = newList;
-                  this.setState(this.state);
-                }
-              }, (error) => {
-                Alert.alert('Hata', 'Dosya gönderilirken bir hata oluştu.');
-              });
-              FileSystem.deleteAsync(newFileName);
-            });
-          });
+      }else{
+        this.setState({
+          isFilesUploading:true,
+        });
+        for (const key in photos) {
+          if (photos.hasOwnProperty(key)) {
+            const element = photos[key];
+            const newFileName = FileSystem.documentDirectory + key + '.jpg';
+            let fileCopyResult = await FileSystem.copyAsync({from: element.file,to: newFileName});
+            let res = await FileSystem.readAsStringAsync(newFileName, {encoding: FileSystem.EncodingTypes.Base64});
+            const fileToUpload = {b64: res, mimeType: this.state.assetType == 'Photos' ? 'image/jpeg' : 'video/mp4'};
+            let  uploadResult = await OkulApi.uploadImageFile(fileToUpload, Platform);
+              if (uploadResult != null && uploadResult.fileId != null) {
+                this.state.fileIds.push(uploadResult.fileId);
+                this.state.thumbFileIds.push(uploadResult.thumbFileId);                
+                newList.push(element);
+                this.state.photos = newList;
+                this.state.isFilesUploading = key < (photos.length-1);
+                this.setState(this.state);
+                await FileSystem.deleteAsync(newFileName);
+              }
+          }
+        }
+      }
 
-        }
-        }
-    }).catch((e) => console.log(e))
+    }   
   }  
 
   selectedReceivers(state){
@@ -230,7 +226,7 @@ export class NotificationScreen extends React.Component {
 
             <Text note>Galeri</Text>
             <Item>
-            <Text>{this.state.photos.length} adet resim/video seçili.   </Text>
+            <Text>{this.state.photos.length} adet resim seçili.   </Text>
               <Button rounded onPress={() => {this.setState({imageBrowserOpen: true, assetType:'Photos'})}}>
                   <Text>Seç</Text>
               </Button>
@@ -238,7 +234,7 @@ export class NotificationScreen extends React.Component {
             <KeyboardAvoidingView style={{ flex: 1 }} behavior="padding" enabled>
               <Text note>Mesaj</Text>
               <Textarea rowSpan={5} bordered placeholder="mesaj.." value={this.state.message} onChangeText={(message)=>{this.setState({message:message})}} />
-              <Button full style={{marginTop : 20}} onPress={()=>this.sendNotify()}>
+              <Button full style={{marginTop : 20}} onPress={()=>this.sendNotify()} disabled={this.state.isFilesUploading}>
                 <Text>Duyuru Gönder</Text>
               </Button>
             </KeyboardAvoidingView>

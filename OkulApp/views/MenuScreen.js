@@ -19,19 +19,19 @@ export class MenuScreen extends React.Component {
     if(OkulApi.userRole != 'parent'){
       return (
         <Content>
-            <Button style={styles.button} block light>
+            <Button style={styles.button} block light onPress={()=>{this.props.navigation.navigate('StCheckIn');}}>
               <Icon name='checkmark-circle' />
               <Text>Öğrenci Yoklama</Text>
             </Button>
-            <Button style={styles.button} block light >
+            <Button style={styles.button} block light onPress={()=>{this.props.navigation.navigate('StMeal');}}>
               <Icon name='restaurant' />
               <Text>Beslenme Bilgisi</Text>
             </Button>
-            <Button style={styles.button} block light>
+            <Button style={styles.button} block light onPress={()=>{this.props.navigation.navigate('StSleep');}}>
               <Icon name='bed' />
               <Text>Uyku Bilgisi</Text>
             </Button>
-            <Button style={styles.button} block light>
+            <Button style={styles.button} block light onPress={()=>{this.props.navigation.navigate('StEmotion');}}>
               <Icon name='happy' />
               <Text>Duygu Durumu</Text>
             </Button>

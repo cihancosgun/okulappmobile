@@ -37,7 +37,7 @@ export class GalleryScreen extends React.Component {
           />
         <Text>{ this.state != null && this.state.position != null ? this.state.position+1 : ''} / {OkulApi.imageGallery.length}</Text>
         <Button
-          onPress={() => this.props.navigation.navigate('App')}
+          onPress={this.props.backCallBack}
           title="Geri"
         />
       </View>

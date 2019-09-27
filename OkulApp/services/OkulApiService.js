@@ -12,10 +12,10 @@ export class OkulApi extends React.Component {
         super(props);
     }
 
-    static apiURL = "http://172.16.121.31:8080/OkulApp-web/webresources/api/";
-    static wsURL = "http://172.16.121.31:8080/OkulApp-web/ws";
-    // static apiURL = "http:/192.168.134.36:8080/OkulApp-web/webresources/api/";
-    // static wsURL = "http://192.168.134.36:8080/OkulApp-web/ws";
+    // static apiURL = "http://172.16.121.31:8080/OkulApp-web/webresources/api/";
+    // static wsURL = "http://172.16.121.31:8080/OkulApp-web/ws";
+    static apiURL = "http:/192.168.134.36:8080/OkulApp-web/webresources/api/";
+    static wsURL = "http://192.168.134.36:8080/OkulApp-web/ws";
 
     static ws = null;
 
@@ -197,6 +197,191 @@ export class OkulApi extends React.Component {
     static getStudentParentsOfClass(classId, successCalback, errroCallBack) {
         this.refreshToken().then(() => {
             fetch(this.apiURL + 'getStudentParentsOfClass?classId=' + classId.$oid, {
+                    method: 'GET',
+                    headers: {
+                        Accept: 'application/json;charset=UTF-8',
+                        'Content-Type': 'application/json;charset=UTF-8',
+                        'Authorization': OkulApi.token
+                    }
+                }).then((response) => response.json())
+                .catch((res) => {
+                    console.log(res)
+                })
+                .then((response) => {
+                    if (response.result != null && successCalback != null) {
+                        successCalback(response.result);
+                    } else {
+                        if (errroCallBack != null) {
+                            errroCallBack();
+                        }
+                    }
+                });
+        });
+    }
+
+    static getDailyInspection(successCalback, errroCallBack) {
+        this.refreshToken().then(() => {
+            fetch(this.apiURL + 'getDailyInspection', {
+                    method: 'GET',
+                    headers: {
+                        Accept: 'application/json;charset=UTF-8',
+                        'Content-Type': 'application/json;charset=UTF-8',
+                        'Authorization': OkulApi.token
+                    }
+                }).then((response) => response.json())
+                .catch((res) => {
+                    console.log(res)
+                })
+                .then((response) => {
+                    if (response.result != null && successCalback != null) {
+                        successCalback(response.result);
+                    } else {
+                        if (errroCallBack != null) {
+                            errroCallBack();
+                        }
+                    }
+                });
+        });
+    }
+
+
+    static setInspectionStatusOfStudent(student, comeIn, successCalback, errroCallBack) {
+        this.refreshToken().then(() => {
+            var record = student;
+            record.comeIn = comeIn;
+            fetch(this.apiURL + 'setInspectionStatusOfStudent', {
+                    method: 'POST',
+                    headers: {
+                        Accept: 'application/json;charset=UTF-8',
+                        'Content-Type': 'application/json;charset=UTF-8',
+                        'Authorization': OkulApi.token
+                    },
+                    body: JSON.stringify(record),
+                }).then((response) => response.json())
+                .then((response) => {
+                    if (response.result && successCalback != null) {
+                        successCalback(response.result);
+                    } else {
+                        if (errroCallBack != null) {
+                            errroCallBack();
+                        }
+                    }
+                });
+        });
+    }
+
+
+    static getDailyActivity(classId, activityType, meal, successCalback, errroCallBack) {
+        this.refreshToken().then(() => {
+            fetch(this.apiURL + 'getDailyActivity?classId=' + classId.$oid +'&activityType=' + activityType + '&meal=' + meal, {
+                    method: 'GET',
+                    headers: {
+                        Accept: 'application/json;charset=UTF-8',
+                        'Content-Type': 'application/json;charset=UTF-8',
+                        'Authorization': OkulApi.token
+                    }
+                }).then((response) => response.json() )
+                .catch((res) => {
+                    console.log(res)
+                })
+                .then((response) => {
+                    if (response.result != null && successCalback != null) {
+                        successCalback(response.result);
+                    } else {
+                        if (errroCallBack != null) {
+                            errroCallBack();
+                        }
+                    }
+                });
+        });
+    }
+
+
+    static setMealStatusOfStudent(classId, activityType, meal, student, status, successCalback, errroCallBack) {
+        this.refreshToken().then(() => {
+            var record = student;
+            record.meal = meal;
+            record.status = status;
+            record.class = classId;
+            record.activityType = activityType;            
+            fetch(this.apiURL + 'setMealStatusOfStudent', {
+                    method: 'POST',
+                    headers: {
+                        Accept: 'application/json;charset=UTF-8',
+                        'Content-Type': 'application/json;charset=UTF-8',
+                        'Authorization': OkulApi.token
+                    },
+                    body: JSON.stringify(record),
+                }).then((response) => response.json())
+                .then((response) => {
+                    if (response.result && successCalback != null) {
+                        successCalback(response.result);
+                    } else {
+                        if (errroCallBack != null) {
+                            errroCallBack();
+                        }
+                    }
+                });
+        });
+    }
+
+    static setSleepStatusOfStudent(classId, activityType, student, status, successCalback, errroCallBack) {
+        this.refreshToken().then(() => {
+            var record = student;
+            record.status = status;
+            record.class = classId;
+            record.activityType = activityType;            
+            fetch(this.apiURL + 'setSleepStatusOfStudent', {
+                    method: 'POST',
+                    headers: {
+                        Accept: 'application/json;charset=UTF-8',
+                        'Content-Type': 'application/json;charset=UTF-8',
+                        'Authorization': OkulApi.token
+                    },
+                    body: JSON.stringify(record),
+                }).then((response) => response.json())
+                .then((response) => {
+                    if (response.result && successCalback != null) {
+                        successCalback(response.result);
+                    } else {
+                        if (errroCallBack != null) {
+                            errroCallBack();
+                        }
+                    }
+                });
+        });
+    }
+
+    static setEmotionStatusOfStudent(classId, activityType, student, status, successCalback, errroCallBack) {
+        this.refreshToken().then(() => {
+            var record = student;
+            record.status = status;
+            record.class = classId;
+            record.activityType = activityType;            
+            fetch(this.apiURL + 'setEmotionStatusOfStudent', {
+                    method: 'POST',
+                    headers: {
+                        Accept: 'application/json;charset=UTF-8',
+                        'Content-Type': 'application/json;charset=UTF-8',
+                        'Authorization': OkulApi.token
+                    },
+                    body: JSON.stringify(record),
+                }).then((response) => response.json())
+                .then((response) => {
+                    if (response.result && successCalback != null) {
+                        successCalback(response.result);
+                    } else {
+                        if (errroCallBack != null) {
+                            errroCallBack();
+                        }
+                    }
+                });
+        });
+    }
+
+    static getStudentsOfClass(classId, successCalback, errroCallBack) {
+        this.refreshToken().then(() => {
+            fetch(this.apiURL + 'getStudentsOfClass?classId=' + classId.$oid, {
                     method: 'GET',
                     headers: {
                         Accept: 'application/json;charset=UTF-8',
@@ -414,30 +599,29 @@ export class OkulApi extends React.Component {
         return result;
     }
 
-    static uploadImageFile(photo, Platform, successCalback, errroCallBack) {
-        this.refreshToken().then(() => {
-            fetch(this.apiURL + 'uploadImageFile', {
-                    method: 'POST',
-                    headers: {
-                        Accept: 'application/json;charset=UTF-8',
-                        'Content-Type': 'application/json;charset=UTF-8',
-                        'Authorization': OkulApi.token
-                    },
-                    body: JSON.stringify({
-                        base64: photo.b64,
-                        mimeType: photo.mimeType
-                    })
-                }).then((response) => {
-                    const jsonBody = JSON.parse(response._bodyText);
-                    if (successCalback != null) {
-                        successCalback(jsonBody);
-                    } else {
-                        if (errroCallBack != null) {
-                            errroCallBack();
-                        }
-                    }
-                });
+    static async uploadImageFile(photo, Platform, successCalback, errroCallBack) {
+        const token = await this.refreshToken();
+        const response = await fetch(this.apiURL + 'uploadImageFile', {
+            method: 'POST',
+            headers: {
+                Accept: 'application/json;charset=UTF-8',
+                'Content-Type': 'application/json;charset=UTF-8',
+                'Authorization': OkulApi.token
+            },
+            body: JSON.stringify({
+                base64: photo.b64,
+                mimeType: photo.mimeType
+            })
         });
+        const jsonBody = JSON.parse(response._bodyText);
+        const prms = new Promise(function (resolve, reject) {
+            if (jsonBody != null && jsonBody.fileId != null) {
+                resolve(jsonBody);
+            } else {
+                reject('ERROR : file upload is failed.');
+            }
+        });
+        return prms;
     }
 
     static insertNotifyMessage(notifyState, successCalback, errroCallBack) {

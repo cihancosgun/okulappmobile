@@ -39,7 +39,7 @@ export class ChatSubScreen extends React.Component {
 
   sendMessage() {
     let theMessage = this.state.message;
-    setTimeout(() => {
+    
       OkulApi.addMessageToChat(OkulApi.currentChat._id, theMessage, () => {
         var msg = {
           "userid": OkulApi.userName,
@@ -48,9 +48,8 @@ export class ChatSubScreen extends React.Component {
         };
         OkulApi.wsSend(msg);
       });
-    }, 100);
-
-    setTimeout(() => {
+     
+    
       this.setState({ message: '' });
       OkulApi.currentChat.messages.push(
         {
@@ -66,7 +65,7 @@ export class ChatSubScreen extends React.Component {
       );
       this.setState({ currentChat: OkulApi.currentChat });
       this.myScrollToEnd();
-    }, 100);
+    
 
   }
 
