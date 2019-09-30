@@ -33,7 +33,7 @@ export class ContactsScreen extends React.Component {
   };
 
   async componentDidMount() { 
-    Moment.locale('tr');
+    
     this.loadList(this);
   }
 
@@ -42,7 +42,7 @@ export class ContactsScreen extends React.Component {
   }
 
   loadList(thiz){
-    // setTimeout(()=>{
+     setTimeout(()=>{
       OkulApi.getTeachers(thiz.state != null ? thiz.state.search : '', (result)=>{
         var newState= {isFetchingA:false, teachers:result};
         thiz.setState(newState);
@@ -50,9 +50,9 @@ export class ContactsScreen extends React.Component {
         var newState= {isFetchingA:false, teachers:[]};
         thiz.setState(newState);
       });
-    // },200);
+     },10);
      
-    // setTimeout(()=>{
+     setTimeout(()=>{
     OkulApi.getStudentParents(thiz.state != null ? thiz.state.search : '', (result)=>{
       var newState= {isFetchingB:false, studentParents:result};
       thiz.setState(newState);
@@ -60,8 +60,8 @@ export class ContactsScreen extends React.Component {
       var newState= {isFetchingB:false, studentParents:[]};
       thiz.setState(newState);
     });
-  // },300);
-      // setTimeout(()=>{
+   },20);
+       setTimeout(()=>{
       OkulApi.getStuffs(thiz.state != null ? thiz.state.search : '', (result)=>{
         var newState= {isFetchingC:false, stuffs:result};
         thiz.setState(newState);
@@ -69,7 +69,7 @@ export class ContactsScreen extends React.Component {
         var newState= {isFetchingC:false, stuffs:[]};
         thiz.setState(newState);
       });
-    // },400);
+     },30);
   }
 
   startNewChat(thiz, receiver){

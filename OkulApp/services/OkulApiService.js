@@ -12,10 +12,16 @@ export class OkulApi extends React.Component {
         super(props);
     }
 
+    static serverProtocol = 'http://';
+    static serverWSProtocol = 'ws://';
+    // static serverIP = '192.168.2.2';
+    static serverIP = '172.16.121.31';
+    static serverPort = ':8080';
+
     // static apiURL = "http://172.16.121.31:8080/OkulApp-web/webresources/api/";
     // static wsURL = "http://172.16.121.31:8080/OkulApp-web/ws";
-    static apiURL = "http:/192.168.134.36:8080/OkulApp-web/webresources/api/";
-    static wsURL = "http://192.168.134.36:8080/OkulApp-web/ws";
+    static apiURL = this.serverProtocol + this.serverIP + this.serverPort + "/OkulApp-web/webresources/api/";
+    static wsURL = this.serverWSProtocol + this.serverIP + this.serverPort + "/OkulApp-web/ws";
 
     static ws = null;
 
@@ -98,6 +104,21 @@ export class OkulApi extends React.Component {
             }
         })
         return prms;
+    }
+
+    static setPushToken(token) {
+        this.refreshToken().then(() => {
+            var record = {userName : OkulApi.userName, token : token};
+            return fetch(this.apiURL + 'setPushToken', {
+                    method: 'POST',
+                    headers: {
+                        Accept: 'application/json;charset=UTF-8',
+                        'Content-Type': 'application/json;charset=UTF-8',
+                        'Authorization': OkulApi.token
+                    },
+                    body: JSON.stringify(record),
+                });
+        });
     }
 
     static getUserRole(successCalback, errroCallBack) {
@@ -273,14 +294,14 @@ export class OkulApi extends React.Component {
 
     static getDailyActivity(classId, activityType, meal, successCalback, errroCallBack) {
         this.refreshToken().then(() => {
-            fetch(this.apiURL + 'getDailyActivity?classId=' + classId.$oid +'&activityType=' + activityType + '&meal=' + meal, {
+            fetch(this.apiURL + 'getDailyActivity?classId=' + classId.$oid + '&activityType=' + activityType + '&meal=' + meal, {
                     method: 'GET',
                     headers: {
                         Accept: 'application/json;charset=UTF-8',
                         'Content-Type': 'application/json;charset=UTF-8',
                         'Authorization': OkulApi.token
                     }
-                }).then((response) => response.json() )
+                }).then((response) => response.json())
                 .catch((res) => {
                     console.log(res)
                 })
@@ -303,7 +324,7 @@ export class OkulApi extends React.Component {
             record.meal = meal;
             record.status = status;
             record.class = classId;
-            record.activityType = activityType;            
+            record.activityType = activityType;
             fetch(this.apiURL + 'setMealStatusOfStudent', {
                     method: 'POST',
                     headers: {
@@ -330,7 +351,7 @@ export class OkulApi extends React.Component {
             var record = student;
             record.status = status;
             record.class = classId;
-            record.activityType = activityType;            
+            record.activityType = activityType;
             fetch(this.apiURL + 'setSleepStatusOfStudent', {
                     method: 'POST',
                     headers: {
@@ -357,7 +378,7 @@ export class OkulApi extends React.Component {
             var record = student;
             record.status = status;
             record.class = classId;
-            record.activityType = activityType;            
+            record.activityType = activityType;
             fetch(this.apiURL + 'setEmotionStatusOfStudent', {
                     method: 'POST',
                     headers: {
@@ -664,7 +685,7 @@ export class OkulApi extends React.Component {
                         'Content-Type': 'application/json;charset=UTF-8',
                         'Authorization': OkulApi.token
                     }
-                }).then((response) => response.json() )
+                }).then((response) => response.json())
                 .catch((res) => {
                     console.log(res)
                 })

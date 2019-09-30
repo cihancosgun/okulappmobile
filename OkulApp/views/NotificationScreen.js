@@ -40,7 +40,7 @@ export class NotificationScreen extends React.Component {
   };
 
   async componentDidMount() { 
-    Moment.locale('tr');    
+        
     Permissions.askAsync(Permissions.CAMERA_ROLL).then(d => console.log(d));
   }
 

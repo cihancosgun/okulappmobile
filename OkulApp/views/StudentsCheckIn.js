@@ -32,7 +32,7 @@ export class StudentsCheckIn extends React.Component {
   };
 
   async componentDidMount() { 
-    Moment.locale('tr');
+    
     OkulApi.getDailyInspection((result)=>{
       this.setState({data:result});
 

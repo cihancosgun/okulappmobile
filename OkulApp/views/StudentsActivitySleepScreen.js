@@ -32,7 +32,7 @@ export class StudentsActivitySleepScreen extends React.Component {
   };
 
   async componentDidMount() { 
-    Moment.locale('tr');
+    
     OkulApi.getClasses('',(result)=>{
       this.setState({classes:result});
       if(result != null && result.length>0){
@@ -50,22 +50,28 @@ export class StudentsActivitySleepScreen extends React.Component {
 
   loadList(thiz){
     this.setState({studentCheckInMap:{}});
-    OkulApi.getDailyActivity(this.state.selectedClass,'sleep','', (result)=>{
-      this.setState({data:result});
-      result.students.forEach(element=>{
-        this.state.studentCheckInMap[element.studentId.$oid] = element.status;
+    setTimeout(() => {
+      OkulApi.getDailyActivity(this.state.selectedClass,'sleep','', (result)=>{
+        this.setState({data:result});
+        result.students.forEach(element=>{
+          this.state.studentCheckInMap[element.studentId.$oid] = element.status;
+        });
+        setTimeout(() => {
+          this.setState(this.state);
+        }, 10);      
       });
-      setTimeout(() => {
-        this.setState(this.state);
-      }, 10);      
-    });
+    }, 10);
+    
 
     thiz.setState({isFetching:true, students:[]});
-    OkulApi.getStudentsOfClass(this.state.selectedClass, (result)=>{   
-      this.setState({students:result, isFetching:false});
-    },(r)=>{
-      this.setState({students:[], isFetching:false});
-    });
+    setTimeout(() => {
+      OkulApi.getStudentsOfClass(this.state.selectedClass, (result)=>{   
+        this.setState({students:result, isFetching:false});
+      },(r)=>{
+        this.setState({students:[], isFetching:false});
+      });
+    }, 10);
+   
   }
 
   setSleepStatusOfStudent(student, status){

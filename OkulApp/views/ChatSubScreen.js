@@ -17,7 +17,7 @@ export class ChatSubScreen extends React.Component {
   }
 
   async componentDidMount() {
-    Moment.locale('tr');
+    
     OkulApi.myChatView = this;
   }
 

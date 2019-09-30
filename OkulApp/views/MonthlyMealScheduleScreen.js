@@ -30,7 +30,7 @@ export class MonthlyMealScheduleScreen extends React.Component {
   };
 
   async componentDidMount() { 
-    Moment.locale('tr');
+    
     this.selectMonth(this.state.months[new Date().getMonth()]);   
   }
 
@@ -43,9 +43,11 @@ export class MonthlyMealScheduleScreen extends React.Component {
  
   loadList(thiz){
     this.setState({data:{}});
-    OkulApi.getFoodCalendar(this.state.selectedMonth, (result)=>{
-      this.setState({data:result});      
-    });
+    setTimeout(() => {
+      OkulApi.getFoodCalendar(this.state.selectedMonth, (result)=>{
+        this.setState({data:result});      
+      });
+    }, 10);    
   }
 
 

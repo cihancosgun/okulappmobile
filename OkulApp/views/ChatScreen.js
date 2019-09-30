@@ -26,7 +26,7 @@ export class ChatScreen extends React.Component {
   };
 
   async componentDidMount() { 
-    Moment.locale('tr');
+    
     this.loadList(this);
   }
 

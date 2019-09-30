@@ -9,9 +9,8 @@ import {
   Image,
   Alert, KeyboardAvoidingView, AsyncStorage
 } from 'react-native';
-import { Svg } from 'expo';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import  { faAt, faKey, faSchool } from '@fortawesome/free-solid-svg-icons';
+import { Svg, Notifications, Permissions } from 'expo';
+import { Icon } from 'native-base';
 import { OkulApi } from '../services/OkulApiService';
 
 
@@ -25,6 +24,35 @@ export class LoginView extends React.Component {
       password: ''
     }
   }
+
+  async registerForPushNotificationsAsync() {
+    const { status: existingStatus } = await Permissions.getAsync(
+      Permissions.NOTIFICATIONS
+    );
+    let finalStatus = existingStatus;
+  
+    // only ask if permissions have not already been determined, because
+    // iOS won't necessarily prompt the user a second time.
+    if (existingStatus !== 'granted') {
+      // Android remote notification permissions are granted during the app
+      // install, so this will only ask on iOS
+      const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
+      finalStatus = status;
+    }
+  
+    // Stop here if the user did not grant permissions
+    if (finalStatus !== 'granted') {
+      return;
+    }
+  
+    // Get the token that uniquely identifies this device
+    let token = await Notifications.getExpoPushTokenAsync();
+    console.log(token);
+  
+    // POST the token to your backend server from where you can retrieve it to send push notifications.
+    return  OkulApi.setPushToken(token);
+  }
+
 
   onLogin = () => {
       if(this.state == null || this.state.login == null){
@@ -40,6 +68,7 @@ export class LoginView extends React.Component {
         this.state.token = token;
         AsyncStorage.setItem('userName',this.state.login);
         AsyncStorage.setItem('password',this.state.password);
+        this.registerForPushNotificationsAsync();
         this.props.navigation.navigate('App');
         },()=>{
           Alert.alert("Başarısız", "Kullanıcı adı veya parola hatalı");
@@ -51,11 +80,11 @@ export class LoginView extends React.Component {
   render() {
     return (
       <KeyboardAvoidingView style={styles.container} behavior="padding" enabled>
-      <FontAwesomeIcon icon={ faSchool } style={{marginBottom:30}} size={64}/>
-      <Text>Okul APP</Text>      
+      <Image source={require('../assets/icon.png')} style={{marginBottom:30, width:150, height:150}}/>
+      <Text>Bilgiyuvam Anaokulu</Text>      
       <Text style={{marginBottom: 30}}>kullanıcı girişi</Text>
         <View style={styles.inputContainer}>        
-        <FontAwesomeIcon icon={ faAt } style={styles.inputIcon}/>
+        <Icon name='at' style={styles.inputIcon} />
           <TextInput style={styles.inputs}
               placeholder="Eposta"
               keyboardType="email-address"
@@ -64,7 +93,7 @@ export class LoginView extends React.Component {
         </View>
         
         <View style={styles.inputContainer}>
-        <FontAwesomeIcon icon={ faKey } style={styles.inputIcon}/>
+        <Icon name='key' style={styles.inputIcon} />
           <TextInput style={styles.inputs}
               placeholder="Parola"
               secureTextEntry={true}
@@ -109,6 +138,7 @@ const styles = StyleSheet.create({
     width:30,
     height:30,
     marginLeft:15,
+    color:'#00b5ec',
     justifyContent: 'center'
   },
   buttonContainer: {

@@ -33,7 +33,7 @@ export class NotifyReceiversScreen extends React.Component {
   };
 
   async componentDidMount() { 
-    Moment.locale('tr');
+    
     this.loadList(this);
   }
 
@@ -42,7 +42,7 @@ export class NotifyReceiversScreen extends React.Component {
   }
 
   loadList(thiz){
-    // setTimeout(()=>{
+     setTimeout(()=>{
       OkulApi.getTeachers(thiz.state != null ? thiz.state.search : '', (result)=>{
         var newState= {isFetchingA:false, teachers:result};
         thiz.setState(newState);
@@ -50,9 +50,9 @@ export class NotifyReceiversScreen extends React.Component {
         var newState= {isFetchingA:false, teachers:[]};
         thiz.setState(newState);
       });
-    // },10);
+     },10);
      
-    // setTimeout(()=>{
+     setTimeout(()=>{
     OkulApi.getClasses(thiz.state != null ? thiz.state.search : '', (result)=>{
       var newState= {isFetchingB:false, classes:result};
       thiz.setState(newState);
@@ -60,9 +60,9 @@ export class NotifyReceiversScreen extends React.Component {
       var newState= {isFetchingB:false, classes:[]};
       thiz.setState(newState);
     });
-  // },10);
+   },10);
 
-      // setTimeout(()=>{
+       setTimeout(()=>{
       OkulApi.getStuffs(thiz.state != null ? thiz.state.search : '', (result)=>{
         var newState= {isFetchingC:false, stuffs:result};
         thiz.setState(newState);
@@ -70,7 +70,7 @@ export class NotifyReceiversScreen extends React.Component {
         var newState= {isFetchingC:false, stuffs:[]};
         thiz.setState(newState);
       });
-    // },10);
+     },10);
   }
  
   selectItem(data,index,role,thiz){

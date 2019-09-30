@@ -62,7 +62,7 @@ export class HomeScreen extends React.Component {
 
 
   loadList(){
-    Moment.locale('tr');
+    
     OkulApi.getBoardOfUser((result)=>{
       var newState= {isFetching:false, isReady:true, data:result};
       this.setState(newState);
@@ -96,6 +96,9 @@ export class HomeScreen extends React.Component {
 
   hideGallery(){
     this.setState({showGalleryScreen:false, showImageList:false});
+    setTimeout(() => {      
+      this.myFlatList.scrollToOffset({ offset: this.state.scrollState, animated: false });
+    }, 10);
   }
 
   renderTopFourImages(data, thiz){
@@ -106,7 +109,7 @@ export class HomeScreen extends React.Component {
         rval.push(imageUrl);        
       }
     }
-    const imageComponents = rval.map((imageUrl, idx)=> <TouchableHighlight key={Math.random()} onPress={() => thiz.showGallery(data, thiz, idx, 'gallery')}><Image key={'image'+idx} style={styles.image} source={{uri:imageUrl}}/></TouchableHighlight>)
+    const imageComponents = rval.map((imageUrl, idx)=> <TouchableHighlight key={Math.random()} onPress={() => thiz.showGallery(data, thiz, idx, 'list')}><Image key={'image'+idx} style={styles.image} source={{uri:imageUrl}}/></TouchableHighlight>)
     return (imageComponents);
   }
 
@@ -126,14 +129,11 @@ export class HomeScreen extends React.Component {
   }
 
   handleGalleryBack(){    
-    this.setState({showGalleryScreen:false, showImageList:false});
-    setTimeout(() => {      
-      this.myFlatList.scrollToOffset({ offset: this.state.scrollState, animated: false });
-    }, 10);
+    this.setState({showGalleryScreen:false, showImageList:true});
   }
 
   async componentDidMount() { 
-    this.myFlatList = React.createRef();
+    this.myFlatList = React.createRef();1
     this.loadList();
   }
 
@@ -142,7 +142,7 @@ export class HomeScreen extends React.Component {
           <Card>
           <CardItem header>
             <Left>
-              <Thumbnail style={styles.thumbImage} source={selectMyIcon(data.item.messageType)} />
+              <Thumbnail style={styles.thumbImage} source={selectMyIcon(data.item.messageType)}/>
               <Body>
                 <Text>{data.item.senderNameSurname}</Text>
                 <Text note>{Moment(new Date(data.item.startDate.$date)).format('DD.MM.YYYY HH:mm:ss')} tarihinde yeni bir gönderi paylaştı.</Text>                
