@@ -7,8 +7,11 @@ import {
   StyleSheet,
   View, Text
 } from 'react-native';
-import { AppLoading, Font } from 'expo';
-import { createStackNavigator, createSwitchNavigator, createAppContainer, createBottomTabNavigator } from 'react-navigation';
+import { AppLoading, Notifications } from 'expo';
+import * as Font from 'expo-font';
+import { createSwitchNavigator, createAppContainer } from 'react-navigation';
+import { createBottomTabNavigator } from 'react-navigation-tabs';
+import { createStackNavigator } from 'react-navigation-stack';
 import { LoginView } from './views/LoginView';
 import { HomeScreen } from './views/HomeScreen';
 import { Ionicons } from '@expo/vector-icons';
@@ -31,6 +34,7 @@ class AuthLoadingScreen extends React.Component {
     super(props);
     this.state = {
       isReady: false,
+      notification: {},
     };    
   }
 
@@ -43,15 +47,25 @@ class AuthLoadingScreen extends React.Component {
     });
     this.setState({ isReady: true });
     this._bootstrapAsync();
-    console.disableYellowBox=true;    
+    console.disableYellowBox=true;   
+    this._notificationSubscription = Notifications.addListener(this._handleNotification); 
   }
+  
+  _handleNotification = (notification) => {
+    this.setState({notification: notification});
+  };
   
 
   _bootstrapAsync = async () => {
     const userToken = await AsyncStorage.getItem('userToken');    
     OkulApi.userName = await AsyncStorage.getItem("userName");
     OkulApi.pass = await AsyncStorage.getItem("password");
-    this.props.navigation.navigate(userToken ? 'App' : 'Auth');
+    if(userToken){
+      OkulApi.refreshUnreadedInfos();
+    }
+    setTimeout(() => {
+      this.props.navigation.navigate(userToken ? 'App' : 'Auth');
+    }, 2000);    
   };
 
   render() {
@@ -59,7 +73,7 @@ class AuthLoadingScreen extends React.Component {
       return <AppLoading />;
     }    
       return (
-        <View style={styles.container}>
+        <View>
           <ActivityIndicator />
           <StatusBar barStyle="default" />
         </View>
@@ -67,8 +81,8 @@ class AuthLoadingScreen extends React.Component {
   }
 }
 
-class IconWithBadge extends React.Component {
-  render() {
+class IconWithBadge extends React.Component {  
+  render() {    
     const { name, badgeCount, color, size } = this.props;
     return (
       <View style={{ width: 24, height: 24, margin: 5 }}>
@@ -100,7 +114,12 @@ class IconWithBadge extends React.Component {
 
 const HomeIconWithBadge = props => {
   // You should pass down the badgeCount in some other ways like context, redux, mobx or event emitters.
-  return <IconWithBadge {...props} badgeCount={0} />;
+  return <IconWithBadge {...props} badgeCount={OkulApi.unreadedBoard} />;
+};
+
+const MessageIconWithBadge = props => {
+  // You should pass down the badgeCount in some other ways like context, redux, mobx or event emitters.
+  return <IconWithBadge {...props} badgeCount={OkulApi.unreadedMessages} />;
 };
 
 
@@ -126,30 +145,32 @@ const AppStack = createBottomTabNavigator({ Home: HomeScreen, Chat:ChatScreen, M
           IconComponent = HomeIconWithBadge;
         } else if (routeName === 'Chat') {
           iconName = `ios-chatboxes`;
+          IconComponent = MessageIconWithBadge;
         }else if (routeName === 'Menu') {
           iconName = `ios-menu`;
         }
-
         // You can return any component that you like here!
-        return <IconComponent name={iconName} size={25} color={tintColor} />;
+        return <IconComponent name={iconName} size={25} color={tintColor}/>;
       },
+      headerMode:'none'
     }),
     tabBarOptions: {
       activeTintColor: 'blue',
       inactiveTintColor: 'gray',
-    },
+    },    
+      headerMode:'none'      
   });
-const GalleryStack = createStackNavigator({ Gallery: GalleryScreen }, {defaultNavigationOptions: {   header: null }});
-const ChatSubStack = createStackNavigator({ ChatSub: ChatSubScreen }, {defaultNavigationOptions: {   header: null }});
-const ContactsStack = createStackNavigator({ ContactsStack: ContactsScreen }, {defaultNavigationOptions: {   header: null }});
-const NotifyReceiverStack = createStackNavigator({ NotifyReceiver: NotifyReceiversScreen }, {defaultNavigationOptions: {   header: null }});
-const AuthStack = createStackNavigator({ SignIn: LoginView }, {defaultNavigationOptions: {   header: null }});
-const NotifyStack = createStackNavigator({ Notify: NotificationScreen }, {defaultNavigationOptions: {   header: null }});
-const StudentsCheckInStack = createStackNavigator({ StudentsCheckInStack: StudentsCheckIn }, {defaultNavigationOptions: {   header: null }});
-const StudentsActivityMealStack = createStackNavigator({ StudentsActivityMealStack: StudentsActivityMealScreen }, {defaultNavigationOptions: {   header: null }});
-const StudentsActivitySleepStack = createStackNavigator({ StudentsActivitySleepStack: StudentsActivitySleepScreen }, {defaultNavigationOptions: {   header: null }});
-const StudentsActivityEmotionStack = createStackNavigator({ StudentsActivityEmotionStack: StudentsActivityEmotionScreen }, {defaultNavigationOptions: {   header: null }});
-const MonthlyMealScheduleStack = createStackNavigator({ MonthlyMealScheduleStack: MonthlyMealScheduleScreen }, {defaultNavigationOptions: {   header: null }});
+const GalleryStack = createStackNavigator({ Gallery: GalleryScreen }, {defaultNavigationOptions: {   header : null  }});
+const ChatSubStack = createStackNavigator({ ChatSub: ChatSubScreen }, {defaultNavigationOptions: {   header : null  }});
+const ContactsStack = createStackNavigator({ ContactsStack: ContactsScreen }, {defaultNavigationOptions: {   header : null }});
+const NotifyReceiverStack = createStackNavigator({ NotifyReceiver: NotifyReceiversScreen }, {defaultNavigationOptions: {   header : null  }});
+const AuthStack = createStackNavigator({ SignIn: LoginView }, {defaultNavigationOptions: {   header : null  }});
+const NotifyStack = createStackNavigator({ Notify: NotificationScreen }, {defaultNavigationOptions: {   header : null  }});
+const StudentsCheckInStack = createStackNavigator({ StudentsCheckInStack: StudentsCheckIn }, {defaultNavigationOptions: {   header : null  }});
+const StudentsActivityMealStack = createStackNavigator({ StudentsActivityMealStack: StudentsActivityMealScreen }, {defaultNavigationOptions: {   header : null  }});
+const StudentsActivitySleepStack = createStackNavigator({ StudentsActivitySleepStack: StudentsActivitySleepScreen }, {defaultNavigationOptions: {   header : null  }});
+const StudentsActivityEmotionStack = createStackNavigator({ StudentsActivityEmotionStack: StudentsActivityEmotionScreen }, {defaultNavigationOptions: {   header : null  }});
+const MonthlyMealScheduleStack = createStackNavigator({ MonthlyMealScheduleStack: MonthlyMealScheduleScreen }, {defaultNavigationOptions: {   header : null  }});
 
 export default createAppContainer(createSwitchNavigator(
   {

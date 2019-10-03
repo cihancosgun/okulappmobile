@@ -50,7 +50,7 @@ export class NotifyReceiversScreen extends React.Component {
         var newState= {isFetchingA:false, teachers:[]};
         thiz.setState(newState);
       });
-     },10);
+     },500);
      
      setTimeout(()=>{
     OkulApi.getClasses(thiz.state != null ? thiz.state.search : '', (result)=>{
@@ -60,7 +60,7 @@ export class NotifyReceiversScreen extends React.Component {
       var newState= {isFetchingB:false, classes:[]};
       thiz.setState(newState);
     });
-   },10);
+   },1000);
 
        setTimeout(()=>{
       OkulApi.getStuffs(thiz.state != null ? thiz.state.search : '', (result)=>{
@@ -70,7 +70,7 @@ export class NotifyReceiversScreen extends React.Component {
         var newState= {isFetchingC:false, stuffs:[]};
         thiz.setState(newState);
       });
-     },10);
+     },1500);
   }
  
   selectItem(data,index,role,thiz){
@@ -103,7 +103,7 @@ export class NotifyReceiversScreen extends React.Component {
     }
     return (
       <Container>
-         <Header>
+         <Header style={{marginTop:25}}>
               <Left>
                 <Button transparent onPress={()=>this.props.backCallBack()}>
                   <Icon name='arrow-round-back' />

@@ -45,7 +45,7 @@ export class StudentsActivityEmotionScreen extends React.Component {
     this.setState({selectedClass : cls});
     setTimeout(() => {
       this.loadList(this);
-    }, 10);
+    }, 100);
   }
 
   loadList(thiz){
@@ -58,9 +58,9 @@ export class StudentsActivityEmotionScreen extends React.Component {
         });
         setTimeout(() => {
           this.setState(this.state);
-        }, 10);      
+        }, 100);      
       });
-    }, 10);
+    }, 200);
 
 
     thiz.setState({isFetching:true, students:[]});
@@ -70,7 +70,7 @@ export class StudentsActivityEmotionScreen extends React.Component {
       },(r)=>{
         this.setState({students:[], isFetching:false});
       });  
-    }, 10);
+    }, 300);
     
   }
 
@@ -79,13 +79,13 @@ export class StudentsActivityEmotionScreen extends React.Component {
       this.state.studentCheckInMap[student._id.$oid] = status;
       setTimeout(() => {
         this.setState(this.state);
-      }, 10);      
+      }, 200);      
     });
   }
    
 
   renderItem(data, thiz){
-    let thumbUrl = data.item.image != null && data.item.image.$oid != null ? {uri :  OkulApi.apiURL+'getImage?fileId='+data.item.image.$oid } : require('../assets/images/user-profile.png');
+    let thumbUrl = data.item.image != null && data.item.image  && data.item.image.$oid != null ? {uri :  OkulApi.apiURL+'getImage?fileId='+data.item.image.$oid } : require('../assets/images/user-profile.png');
     return (
     <ListItem avatar>
       <Left>
@@ -119,7 +119,7 @@ export class StudentsActivityEmotionScreen extends React.Component {
 
     return (
       <Container>
-         <Header>
+         <Header style={{marginTop:25}}>
               <Left>
                 <Button transparent onPress={()=>this.back()}>
                   <Icon name='arrow-round-back' />

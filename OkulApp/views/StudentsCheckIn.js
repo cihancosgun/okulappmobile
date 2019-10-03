@@ -42,7 +42,7 @@ export class StudentsCheckIn extends React.Component {
 
       setTimeout(() => {
         this.setState(this.state);
-      }, 10);
+      }, 100);
 
         OkulApi.getClasses('',(result)=>{
           this.setState({classes:result});
@@ -57,17 +57,20 @@ export class StudentsCheckIn extends React.Component {
     this.setState({selectedClass : cls});
     setTimeout(() => {
       this.loadList(this);
-    }, 10);    
+    }, 300);    
   }
 
   loadList(thiz){
     this.setState({studentCheckInMap:{}});
     thiz.setState({isFetching:true, students:[]});
-    OkulApi.getStudentsOfClass(this.state.selectedClass, (result)=>{   
-      this.setState({students:result, isFetching:false});
-    },(r)=>{
-      this.setState({students:[], isFetching:false});
-    });
+    setTimeout(() => {
+      OkulApi.getStudentsOfClass(this.state.selectedClass, (result)=>{   
+        this.setState({students:result, isFetching:false});
+      },(r)=>{
+        this.setState({students:[], isFetching:false});
+      });
+    }, 500);
+   
   }
 
   setInspectionStatusOfStudent(student, comeIn){
@@ -75,13 +78,13 @@ export class StudentsCheckIn extends React.Component {
       this.state.studentCheckInMap[student._id.$oid] = comeIn;
       setTimeout(() => {
         this.setState(this.state);
-      }, 10);      
+      }, 100);      
     });
   }
    
 
   renderItem(data, thiz){
-    let thumbUrl = data.item.image != null && data.item.image.$oid != null ? {uri :  OkulApi.apiURL+'getImage?fileId='+data.item.image.$oid } : require('../assets/images/user-profile.png');
+    let thumbUrl = data.item.image != null && data.item.image  && data.item.image.$oid != null ? {uri :  OkulApi.apiURL+'getImage?fileId='+data.item.image.$oid } : require('../assets/images/user-profile.png');
     return (
     <ListItem avatar>
       <Left>
@@ -114,7 +117,7 @@ export class StudentsCheckIn extends React.Component {
 
     return (
       <Container>
-         <Header>
+         <Header style={{marginTop:25}}>
               <Left>
                 <Button transparent onPress={()=>this.back()}>
                   <Icon name='arrow-round-back' />

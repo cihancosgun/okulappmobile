@@ -69,7 +69,11 @@ export class MenuScreen extends React.Component {
   render() {
     return (
       <Container>
-        <Header />
+        <Header>
+          <Title>
+            Menu
+          </Title>
+        </Header>
         {this.renderContent()}
       </Container>
     );

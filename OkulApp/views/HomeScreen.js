@@ -14,15 +14,9 @@ import { GalleryScreen } from './GalleryScreen';
 const { width } = Dimensions.get('window');
 
 export class HomeScreen extends React.Component {
-  constructor(props) {
+  constructor(props) {    
     super(props);
-    state = {
-      data:null,
-      isReady : false,
-      isFetching:true,
-      showGalleryScreen:false,
-      showImageList:false,
-      scrollState:10,
+    this.state = {
       messageTypeImages:{
         'board':require('../assets/images/board.png'),
         'angry':require('../assets/images/angry.png'),
@@ -37,13 +31,20 @@ export class HomeScreen extends React.Component {
         'sad':require('../assets/images/sad.png'),
         'sleep':require('../assets/images/sleep.png'),
         'user-profile':require('../assets/images/user-profile.png')
-      }
+      },
+      data:null,
+      isReady : false,
+      isFetching:true,
+      showGalleryScreen:false,
+      showImageList:false,
+      scrollState:10      
     }
   }
 
   static navigationOptions = {
     title: 'Ana Sayfa',
-    drawerLabel: 'Ana Sayfa',    
+    drawerLabel: 'Ana Sayfa',
+    headerMode:'none'
   };
   
   onRefresh(){
@@ -61,15 +62,21 @@ export class HomeScreen extends React.Component {
   }
 
 
-  loadList(){
-    
-    OkulApi.getBoardOfUser((result)=>{
+  loadList(){    
+    OkulApi.getBoardOfUser((result)=>{      
+      result.forEach(element => {
+        element.iconImage = this.selectMyIcon(element.messageType);        
+      });
       var newState= {isFetching:false, isReady:true, data:result};
       this.setState(newState);
     }, ()=>{
       var newState= {isFetching:false, isReady:true, data:[]};
       this.setState(newState);
     });
+
+    setTimeout(() => {
+      OkulApi.setReadedAllBoard();
+    }, 1000);
   }
 
   showGallery(data, thiz, idx, type){
@@ -132,9 +139,11 @@ export class HomeScreen extends React.Component {
     this.setState({showGalleryScreen:false, showImageList:true});
   }
 
-  async componentDidMount() { 
-    this.myFlatList = React.createRef();1
-    this.loadList();
+  async componentDidMount() {         
+    this.myFlatList = React.createRef();
+    setTimeout(() => {
+      this.loadList();
+    }, 500);    
   }
 
   renderItem(data, selectMyIcon, showGallery, thiz){
@@ -142,7 +151,7 @@ export class HomeScreen extends React.Component {
           <Card>
           <CardItem header>
             <Left>
-              <Thumbnail style={styles.thumbImage} source={selectMyIcon(data.item.messageType)}/>
+              <Thumbnail style={styles.thumbImage} source={data.item.iconImage}/>
               <Body>
                 <Text>{data.item.senderNameSurname}</Text>
                 <Text note>{Moment(new Date(data.item.startDate.$date)).format('DD.MM.YYYY HH:mm:ss')} tarihinde yeni bir gönderi paylaştı.</Text>                
@@ -176,7 +185,7 @@ export class HomeScreen extends React.Component {
     }
     if(this.state.showImageList){
       return(
-        <View style={{flex:1}}>
+        <View style={{flex:1, backgroundColor:'white', marginTop:30}}>
           <FlatList 
             data={OkulApi.imageGallery} 
             renderItem={(item)=>this.renderImageItem(item , this)} 
@@ -191,12 +200,8 @@ export class HomeScreen extends React.Component {
     }
       return (
         <Container>
-        <Header>
-            <Left/>
-            <Body>
-              <Title>Ana Sayfa</Title>
-            </Body>
-            <Right />
+          <Header>
+            <Title>Ana Sayfa</Title>
           </Header>
             <FlatList ref={(fl)=>this.myFlatList=fl}
               data={this.state.data}

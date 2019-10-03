@@ -15,13 +15,15 @@ export class OkulApi extends React.Component {
     static serverProtocol = 'http://';
     static serverWSProtocol = 'ws://';
     // static serverIP = '192.168.2.2';
-    static serverIP = '172.16.121.31';
-    static serverPort = ':8080';
+    // static serverIP = '172.16.121.31';
+    static serverIP = 'app.bilgiyuvamanaokulu.com';
+    // static serverPort = ':8080';
+    static serverPort = '';
 
     // static apiURL = "http://172.16.121.31:8080/OkulApp-web/webresources/api/";
     // static wsURL = "http://172.16.121.31:8080/OkulApp-web/ws";
-    static apiURL = this.serverProtocol + this.serverIP + this.serverPort + "/OkulApp-web/webresources/api/";
-    static wsURL = this.serverWSProtocol + this.serverIP + this.serverPort + "/OkulApp-web/ws";
+    static apiURL = this.serverProtocol + this.serverIP + this.serverPort + "/bilgiyuvam/webresources/api/";
+    static wsURL = this.serverWSProtocol + this.serverIP + this.serverPort + "/bilgiyuvam/ws";
 
     static ws = null;
 
@@ -30,6 +32,8 @@ export class OkulApi extends React.Component {
     static token = "";
     static tokenEndDate = new Date();
     static userRole = "";
+    static unreadedBoard = 0;
+    static unreadedMessages = 0;
 
     static addMinutes(date, minutes) {
         return new Date(date.getTime() + minutes * 60000);
@@ -64,7 +68,7 @@ export class OkulApi extends React.Component {
             method: 'POST',
             headers: {
                 Accept: 'application/json',
-                'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+                'Content-Type': 'application/x-www-form-urlencoded'
             },
             body: formBody
         }).then((response) => {
@@ -94,6 +98,7 @@ export class OkulApi extends React.Component {
                 console.log('token refreshed');
                 OkulApi.getToken(OkulApi.userName, OkulApi.pass, (res) => {
                     resolve(res);
+                    OkulApi.refreshUnreadedInfos();
                 }, (e) => {
                     console.log(e);
                     reject('ERROR to take token');
@@ -106,18 +111,28 @@ export class OkulApi extends React.Component {
         return prms;
     }
 
+    static refreshUnreadedInfos(){
+        setTimeout(() => {
+            OkulApi.getUnreadedBoard();
+            OkulApi.getUnreadedMessages();
+        }, 500);
+    }
+
     static setPushToken(token) {
         this.refreshToken().then(() => {
-            var record = {userName : OkulApi.userName, token : token};
+            var record = {
+                userName: OkulApi.userName,
+                token: token
+            };
             return fetch(this.apiURL + 'setPushToken', {
-                    method: 'POST',
-                    headers: {
-                        Accept: 'application/json;charset=UTF-8',
-                        'Content-Type': 'application/json;charset=UTF-8',
-                        'Authorization': OkulApi.token
-                    },
-                    body: JSON.stringify(record),
-                });
+                method: 'POST',
+                headers: {
+                    Accept: 'application/json;charset=UTF-8',
+                    'Content-Type': 'application/json;charset=UTF-8',
+                    'Authorization': OkulApi.token
+                },
+                body: JSON.stringify(record),
+            });
         });
     }
 
@@ -497,6 +512,51 @@ export class OkulApi extends React.Component {
         });
     }
 
+    static getUnreadedMessages(successCalback, errroCallBack) {
+        this.refreshToken().then(() => {
+            fetch(this.apiURL + 'getUnreadedMessages', {
+                    method: 'GET',
+                    headers: {
+                        Accept: 'application/json;charset=UTF-8',
+                        'Content-Type': 'application/json;charset=UTF-8',
+                        'Authorization': OkulApi.token
+                    }
+                }).then((response) => response.json())
+                .then((response) => {
+                    OkulApi.unreadedMessages = response != null && response.list != null ? response.list.length : 0;
+                    if (response.list && successCalback != null) {
+                        successCalback(response.list);
+                    } else {
+                        if (errroCallBack != null) {
+                            errroCallBack();
+                        }
+                    }
+                });
+        });
+    }
+
+    static getUnreadedMessagesInChat(chatId, successCalback, errroCallBack) {
+        this.refreshToken().then(() => {
+            fetch(this.apiURL + 'getUnreadedMessagesInChat?chatId='+chatId, {
+                    method: 'GET',
+                    headers: {
+                        Accept: 'application/json;charset=UTF-8',
+                        'Content-Type': 'application/json;charset=UTF-8',
+                        'Authorization': OkulApi.token
+                    }
+                }).then((response) => response.json())
+                .then((response) => {
+                    if (response.list && successCalback != null) {
+                        successCalback(response.list);
+                    } else {
+                        if (errroCallBack != null) {
+                            errroCallBack();
+                        }
+                    }
+                });
+        });
+    }
+
     static getChat(chatId, successCalback, errroCallBack) {
         this.refreshToken().then(() => {
             fetch(this.apiURL + 'getChat?chatId=' + chatId, {
@@ -585,8 +645,32 @@ export class OkulApi extends React.Component {
                     }
                 }).then((response) => response.json())
                 .then((response) => {
+                    this.unreadedBoard = response.list != null ? response.list.length : 0;
                     if (response.list && successCalback != null) {
                         successCalback(response.list);
+                    } else {
+                        if (errroCallBack != null) {
+                            errroCallBack();
+                        }
+                    }
+                });
+        });
+    }
+
+    static setReadedAllBoard(successCalback, errroCallBack) {
+        this.refreshToken().then(() => {
+            fetch(this.apiURL + 'setReadedAllBoard', {
+                    method: 'GET',
+                    headers: {
+                        Accept: 'application/json;charset=UTF-8',
+                        'Content-Type': 'application/json;charset=UTF-8',
+                        'Authorization': OkulApi.token
+                    }
+                }).then((response) => response.json())
+                .then((response) => {
+                    if (response.result && successCalback != null) {
+                        OkulApi.unreadedBoard = 0;
+                        successCalback(response.result);
                     } else {
                         if (errroCallBack != null) {
                             errroCallBack();
@@ -622,25 +706,28 @@ export class OkulApi extends React.Component {
 
     static async uploadImageFile(photo, Platform, successCalback, errroCallBack) {
         const token = await this.refreshToken();
-        const response = await fetch(this.apiURL + 'uploadImageFile', {
-            method: 'POST',
-            headers: {
-                Accept: 'application/json;charset=UTF-8',
-                'Content-Type': 'application/json;charset=UTF-8',
-                'Authorization': OkulApi.token
-            },
-            body: JSON.stringify({
+        let xhr = new XMLHttpRequest();
+        const prms = new Promise(function (resolve, reject) {
+            let json = JSON.stringify({
                 base64: photo.b64,
                 mimeType: photo.mimeType
-            })
-        });
-        const jsonBody = JSON.parse(response._bodyText);
-        const prms = new Promise(function (resolve, reject) {
-            if (jsonBody != null && jsonBody.fileId != null) {
-                resolve(jsonBody);
-            } else {
-                reject('ERROR : file upload is failed.');
-            }
+            });
+            xhr.onreadystatechange = (e) => {
+                if (xhr.readyState !== 4) {
+                    return;
+                }
+                const jsonBody = JSON.parse(xhr.responseText);
+                if (xhr.status === 200 && jsonBody != null && jsonBody.fileId != null) {
+                    resolve(jsonBody);
+                } else {
+                    reject('ERROR : file upload is failed.');
+                }
+            };
+
+            xhr.open("POST", OkulApi.apiURL + 'uploadImageFile');
+            xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+            xhr.setRequestHeader('Authorization', OkulApi.token);
+            xhr.send(json);
         });
         return prms;
     }
@@ -712,8 +799,12 @@ export class OkulApi extends React.Component {
             var jsonData = JSON.parse(e.data);
             if (e.data != null && jsonData != null && jsonData.receivers != null) {
                 if (jsonData.receivers.indexOf(OkulApi.userName) > -1) {
+                    OkulApi.refreshUnreadedInfos();
                     if (jsonData.message == "updatechat" && OkulApi.currentChat != null && OkulApi.currentChat._id != null) {
                         OkulApi.refreshChat();
+                    }
+                    if (jsonData.message == "updatenotify") {
+                        OkulApi.refreshUnreadedInfos();
                     }
                 }
             }

@@ -38,7 +38,7 @@ export class MonthlyMealScheduleScreen extends React.Component {
     this.setState({selectedMonth : month});
     setTimeout(() => {
       this.loadList(this);
-    }, 10);
+    }, 100);
   }
  
   loadList(thiz){
@@ -47,7 +47,7 @@ export class MonthlyMealScheduleScreen extends React.Component {
       OkulApi.getFoodCalendar(this.state.selectedMonth, (result)=>{
         this.setState({data:result});      
       });
-    }, 10);    
+    }, 300);    
   }
 
 
@@ -79,7 +79,7 @@ export class MonthlyMealScheduleScreen extends React.Component {
     }
     return (
       <Container>
-         <Header>
+         <Header style={{marginTop:25}}>
               <Left>
                 <Button transparent onPress={()=>this.back()}>
                   <Icon name='arrow-round-back' />

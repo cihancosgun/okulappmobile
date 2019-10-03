@@ -50,7 +50,7 @@ export class ContactsScreen extends React.Component {
         var newState= {isFetchingA:false, teachers:[]};
         thiz.setState(newState);
       });
-     },10);
+     },500);
      
      setTimeout(()=>{
     OkulApi.getStudentParents(thiz.state != null ? thiz.state.search : '', (result)=>{
@@ -60,7 +60,7 @@ export class ContactsScreen extends React.Component {
       var newState= {isFetchingB:false, studentParents:[]};
       thiz.setState(newState);
     });
-   },20);
+   },1000);
        setTimeout(()=>{
       OkulApi.getStuffs(thiz.state != null ? thiz.state.search : '', (result)=>{
         var newState= {isFetchingC:false, stuffs:result};
@@ -69,7 +69,7 @@ export class ContactsScreen extends React.Component {
         var newState= {isFetchingC:false, stuffs:[]};
         thiz.setState(newState);
       });
-     },30);
+     },1500);
   }
 
   startNewChat(thiz, receiver){
@@ -80,7 +80,7 @@ export class ContactsScreen extends React.Component {
   }
 
   renderItem(data, thiz){
-        let thumbUrl = data.item.image != null ? {uri :  OkulApi.apiURL+'getImage?fileId='+data.item.image.$oid } : require('../assets/images/user-profile.png');
+        let thumbUrl = data.item.image != null && data.item.image  ? {uri :  OkulApi.apiURL+'getImage?fileId='+data.item.image.$oid } : require('../assets/images/user-profile.png');
         return (
         <ListItem avatar onPress={()=>{thiz.startNewChat(thiz, data.item);}}>
           <Left>
@@ -92,6 +92,68 @@ export class ContactsScreen extends React.Component {
         </ListItem>
     );  
   }
+  renderTeacherHeader(){
+    if(this.state.teachers != null && this.state.teachers.length > 0){
+      return (<ListItem itemDivider>
+                <Text>Öğretmenler</Text>
+            </ListItem>);
+    }
+  }
+  renderTeachers(){
+    if(this.state.teachers != null && this.state.teachers.length > 0){
+      return (            
+              <FlatList
+                  data={this.state.teachers}
+                  renderItem={(item)=> this.renderItem(item, this)}
+                  keyExtractor={(item) => item._id.$oid}
+                  onRefresh={()=>this.onRefresh(this)}
+                  refreshing={this.state.isFetchingA}
+                />
+              );
+      }
+  }
+
+  renderStudentParentsHeaders(){
+    if(this.state.studentParents != null && this.state.studentParents.length > 0){
+      return (<ListItem itemDivider>
+                <Text>Veliler</Text>
+              </ListItem>);
+    }
+  }
+  renderStudentParents(){
+    if(this.state.studentParents != null && this.state.studentParents.length > 0){
+      return (            
+              <FlatList
+                  data={this.state.studentParents}
+                  renderItem={(item)=> this.renderItem(item, this)}
+                  keyExtractor={(item) => item._id.$oid}
+                  onRefresh={()=>this.onRefresh(this)}
+                  refreshing={this.state.isFetchingB}
+                />
+              );
+      }
+  }
+
+  renderAdminsHeaders(list){
+    if(list != null && list.length > 0){
+      return (<ListItem itemDivider>
+                <Text>Yöneticiler</Text>
+              </ListItem>);
+    }
+  }
+  renderAdmins(list){
+    if(list != null && list.length > 0){
+      return (            
+                <FlatList
+                data={list}
+                renderItem={(item)=> this.renderItem(item, this)}
+                keyExtractor={(item) => item._id.$oid}
+                onRefresh={()=>this.onRefresh(this)}
+                refreshing={this.state.isFetchingC}
+                />
+              );
+      }
+  }
 
   render() {
     if (this.state == null) {
@@ -99,7 +161,7 @@ export class ContactsScreen extends React.Component {
     }
     return (
       <Container>
-         <Header>
+         <Header style={{marginTop:25}}>
               <Left>
                 <Button transparent onPress={()=>this.back()}>
                   <Icon name='arrow-round-back' />
@@ -116,36 +178,12 @@ export class ContactsScreen extends React.Component {
             <Icon active name='search' onPress={()=>this.loadList(this)} />
           </Item>
           <List>
-            <ListItem itemDivider>
-              <Text>Öğretmenler</Text>
-            </ListItem>
-            <FlatList
-                data={this.state.teachers}
-                renderItem={(item)=> this.renderItem(item, this)}
-                keyExtractor={(item) => item._id.$oid}
-                onRefresh={()=>this.onRefresh(this)}
-                refreshing={this.state.isFetchingA}
-              />
-            <ListItem itemDivider>
-              <Text>Veliler</Text>
-            </ListItem>
-            <FlatList
-                data={this.state.studentParents}
-                renderItem={(item)=> this.renderItem(item, this)}
-                keyExtractor={(item) => item._id.$oid}
-                onRefresh={()=>this.onRefresh(this)}
-                refreshing={this.state.isFetchingB}
-              />
-              <ListItem itemDivider>
-              <Text>Yöneticiler</Text>
-            </ListItem>
-            <FlatList
-                data={this.state.stuffs}
-                renderItem={(item)=> this.renderItem(item, this)}
-                keyExtractor={(item) => item._id.$oid}
-                onRefresh={()=>this.onRefresh(this)}
-                refreshing={this.state.isFetchingC}
-              />
+            {this.renderTeacherHeader()}
+            {this.renderTeachers()}
+            {this.renderStudentParentsHeaders()}
+            {this.renderStudentParents()}
+            {this.renderAdminsHeaders(this.state.stuffs)}
+            {this.renderAdmins(this.state.stuffs)}
           </List>
         </Content>        
       </Container>

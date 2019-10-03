@@ -9,17 +9,17 @@ import {
   Image,
   Alert, KeyboardAvoidingView, AsyncStorage
 } from 'react-native';
-import { Svg, Notifications, Permissions } from 'expo';
+import { Svg, Notifications } from 'expo';
 import { Icon } from 'native-base';
 import { OkulApi } from '../services/OkulApiService';
-
+import * as Permissions from 'expo-permissions';
 
 
 export class LoginView extends React.Component {
 
   constructor(props) {
     super(props);
-    state = {
+    this.state = {
       login   : '',
       password: ''
     }

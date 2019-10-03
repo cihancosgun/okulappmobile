@@ -9,7 +9,10 @@ import Moment from 'moment';
 import { OkulApi } from '../services/OkulApiService';
 import  ImageBrowser  from '../components/ImageBrowser';
 import { NotifyReceiversScreen } from './NotifyReceiversScreen';
-import { FileSystem, Asset, Permissions } from 'expo';
+import { Asset } from 'expo';
+import * as Permissions from 'expo-permissions';
+import * as FileSystem from 'expo-file-system';
+
 
 export class NotificationScreen extends React.Component {
   
@@ -71,7 +74,7 @@ export class NotificationScreen extends React.Component {
             const element = photos[key];
             const newFileName = FileSystem.documentDirectory + key + '.jpg';
             let fileCopyResult = await FileSystem.copyAsync({from: element.file,to: newFileName});
-            let res = await FileSystem.readAsStringAsync(newFileName, {encoding: FileSystem.EncodingTypes.Base64});
+            let res = await FileSystem.readAsStringAsync(newFileName, {encoding: FileSystem.EncodingType.Base64});
             const fileToUpload = {b64: res, mimeType: this.state.assetType == 'Photos' ? 'image/jpeg' : 'video/mp4'};
             let  uploadResult = await OkulApi.uploadImageFile(fileToUpload, Platform);
               if (uploadResult != null && uploadResult.fileId != null) {
@@ -184,8 +187,8 @@ export class NotificationScreen extends React.Component {
       return(<ImageBrowser max={50} assetType={this.state.assetType} callback={this.imageBrowserCallback}/>);
     }
    return (
-      <Container> 
-         <Header>
+     <Container>
+         <Header style={{marginTop:25}}>
               <Left>
                 <Button transparent onPress={()=>this.back()}>
                   <Icon name='arrow-round-back' />

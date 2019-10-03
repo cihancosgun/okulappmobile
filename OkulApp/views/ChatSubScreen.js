@@ -84,7 +84,7 @@ export class ChatSubScreen extends React.Component {
   render() {
     let thumbUrl = OkulApi.currentChat.convReceiverImage != null ? {uri :  OkulApi.apiURL+'getImage?fileId='+ OkulApi.currentChat.convReceiverImage.$oid } : require('../assets/images/user-profile.png');
     return (
-      <Container>
+      <Container style={{marginTop:25}}>
         <Header>
           <Left>
             <Button transparent onPress={() => this.back()}>
@@ -122,7 +122,7 @@ const styles = StyleSheet.create({
   },
   scrollView:{
     flex:1,
-    height: Dimensions.get('window').height-110,
+    height: Dimensions.get('window').height-130,
     backgroundColor:'#ebebe0',
   },
   messageReceive:{

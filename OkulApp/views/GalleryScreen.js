@@ -12,12 +12,14 @@ import {
 import Gallery from 'react-native-image-gallery';
 import { OkulApi } from '../services/OkulApiService';
 import { Toast} from 'native-base';
-import { FileSystem, Permissions, MediaLibrary } from 'expo';
+import * as MediaLibrary from 'expo-media-library';
+import * as FileSystem from 'expo-file-system';
+import * as Permissions from 'expo-permissions';
 
 export class GalleryScreen extends React.Component {
   constructor(props) {
     super(props);
-    state = { position:0 }
+    this.state = { position:0 }
   }
 
   static navigationOptions = {
@@ -63,7 +65,7 @@ export class GalleryScreen extends React.Component {
 
   render() {
     return (
-      <View style={{ flex: 1}}>
+      <View style={{ flex: 1, backgroundColor:'white'}}>
          <Gallery key="myGallery" initialPage={OkulApi.imageGalleryIndex}
             style={{ flex: 1, backgroundColor: 'black' }}
               images={OkulApi.imageGallery}
