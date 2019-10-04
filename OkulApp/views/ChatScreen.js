@@ -41,10 +41,12 @@ export class ChatScreen extends React.Component {
       for (const key in this.state.data) {
         if (this.state.data.hasOwnProperty(key)) {
           const element = this.state.data[key];
-          OkulApi.getUnreadedMessagesInChat(element._id.$oid,(res)=>{
-            element.unreadedMessages = res.length;
-            this.setState({data:this.state.data});
-          });
+          setTimeout(() => {
+            OkulApi.getUnreadedMessagesInChat(element._id.$oid,(res)=>{
+              element.unreadedMessages = res.length;
+              this.setState({data:this.state.data});
+            });
+          }, 500);          
         }
       }
     }, ()=>{

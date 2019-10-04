@@ -82,10 +82,10 @@ export class ChatSubScreen extends React.Component {
   }
 
   render() {
-    let thumbUrl = OkulApi.currentChat.convReceiverImage != null ? {uri :  OkulApi.apiURL+'getImage?fileId='+ OkulApi.currentChat.convReceiverImage.$oid } : require('../assets/images/user-profile.png');
+    let thumbUrl = OkulApi.currentChat.convReceiverImage != null &&  OkulApi.currentChat.convReceiverImage ? {uri :  OkulApi.apiURL+'getImage?fileId='+ OkulApi.currentChat.convReceiverImage.$oid } : require('../assets/images/user-profile.png');
     return (
-      <Container style={{marginTop:25}}>
-        <Header>
+      <Container>
+        <Header style={{marginTop:25}}>
           <Left>
             <Button transparent onPress={() => this.back()}>
               <Icon name='arrow-round-back' />
@@ -122,7 +122,7 @@ const styles = StyleSheet.create({
   },
   scrollView:{
     flex:1,
-    height: Dimensions.get('window').height-130,
+    height: Dimensions.get('window').height - 140,
     backgroundColor:'#ebebe0',
   },
   messageReceive:{
