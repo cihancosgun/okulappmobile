@@ -49,6 +49,16 @@ class AuthLoadingScreen extends React.Component {
     this._bootstrapAsync();
     console.disableYellowBox=true;   
     this._notificationSubscription = Notifications.addListener(this._handleNotification); 
+
+    if (Platform.OS === 'android') {
+      Notifications.createChannelAndroidAsync('bilgiyuvam-notifications', {
+        name: 'Bilgiyuvam bilgilendirmeler',
+        sound: true,
+        priority: 'max',
+        vibrate: [0, 250, 250, 250]
+      });
+    }
+    
   }
   
   _handleNotification = (notification) => {

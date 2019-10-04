@@ -6,11 +6,12 @@
     "privacy": "public",
     "sdkVersion": "35.0.0",
     "platforms": ["ios", "android"],
-    "version": "1.0.0",
+    "version": "2.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "notification":{
-      "icon" : "./assets/icon.png",
+      "icon" : "./assets/iconnotify.png",
+      "color":"#30B7FF",
       "iosDisplayInForeground": false
     },
     "splash": {
@@ -30,7 +31,7 @@
     },
     "android": {
       "package": "com.bilgiyuvamanaokulu.bilgiyuvam",
-      "versionCode": 1
+      "versionCode": 2
     }
   }
 }
