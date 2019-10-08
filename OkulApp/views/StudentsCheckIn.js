@@ -34,22 +34,22 @@ export class StudentsCheckIn extends React.Component {
   async componentDidMount() { 
     
     OkulApi.getDailyInspection((result)=>{
-      this.setState({data:result});
-
-      result.students.forEach(element=>{
-        this.state.studentCheckInMap[element.studentId.$oid] = element.comeInStatus;
-      });
-
+      var newState = {data:result, studentCheckInMap:{}};
+      for (const key in result.students) {
+        if (result.students.hasOwnProperty(key)) {
+          const element = result.students[key];
+          newState.studentCheckInMap[element.studentId.$oid] = element.comeInStatus;
+        }
+      }
+      this.setState(newState);      
       setTimeout(() => {
-        this.setState(this.state);
-      }, 100);
-
         OkulApi.getClasses('',(result)=>{
           this.setState({classes:result});
           if(result != null && result.length>0){
             this.selectClass(result[0]._id);
           }
-        });   
+        }); 
+      }, 1000);          
     });  
   }
 
@@ -60,8 +60,7 @@ export class StudentsCheckIn extends React.Component {
     }, 300);    
   }
 
-  loadList(thiz){
-    this.setState({studentCheckInMap:{}});
+  loadList(thiz){    
     thiz.setState({isFetching:true, students:[]});
     setTimeout(() => {
       OkulApi.getStudentsOfClass(this.state.selectedClass, (result)=>{   
