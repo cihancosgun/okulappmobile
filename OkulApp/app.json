@@ -6,12 +6,12 @@
     "privacy": "public",
     "sdkVersion": "35.0.0",
     "platforms": ["ios", "android"],
-    "version": "2.0.0",
+    "version": "4.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "notification":{
-      "icon" : "./assets/iconnotify.png",
-      "color":"#30B7FF",
+    "notification": {
+      "icon": "./assets/iconnotify.png",
+      "color": "#30B7FF",
       "iosDisplayInForeground": false
     },
     "splash": {
@@ -31,7 +31,29 @@
     },
     "android": {
       "package": "com.bilgiyuvamanaokulu.bilgiyuvam",
-      "versionCode": 2
+      "versionCode": 4,
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION",
+        "CAMERA",
+        "MANAGE_DOCUMENTS",
+        "READ_EXTERNAL_STORAGE",
+        "READ_PHONE_STATE",
+        "VIBRATE",
+        "WAKE_LOCK",
+        "WRITE_EXTERNAL_STORAGE",
+        "com.anddoes.launcher.permission.UPDATE_COUNT",
+        "com.android.launcher.permission.INSTALL_SHORTCUT",
+        "com.google.android.c2dm.permission.RECEIVE",
+        "com.google.android.gms.permission.ACTIVITY_RECOGNITION",
+        "com.google.android.providers.gsf.permission.READ_GSERVICES",
+        "com.htc.launcher.permission.READ_SETTINGS",
+        "com.htc.launcher.permission.UPDATE_SHORTCUT",
+        "com.majeur.launcher.permission.UPDATE_BADGE",
+        "com.sec.android.provider.badge.permission.READ",
+        "com.sec.android.provider.badge.permission.WRITE",
+        "com.sonyericsson.home.permission.BROADCAST_BADGE"
+      ]
     }
   }
 }
