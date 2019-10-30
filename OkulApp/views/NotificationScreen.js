@@ -12,6 +12,7 @@ import { NotifyReceiversScreen } from './NotifyReceiversScreen';
 import { Asset } from 'expo';
 import * as Permissions from 'expo-permissions';
 import * as FileSystem from 'expo-file-system';
+import * as ImageManipulator from 'expo-image-manipulator';
 
 
 export class NotificationScreen extends React.Component {
@@ -72,9 +73,17 @@ export class NotificationScreen extends React.Component {
         for (const key in photos) {
           if (photos.hasOwnProperty(key)) {
             const element = photos[key];
+            //resize image in here
+            const newElement = await ImageManipulator.manipulateAsync(
+              element.file,
+              [{ resize: {width : 1024, height: 768} }],
+              { compress: 1, format: ImageManipulator.SaveFormat.JPEG, base64: false }
+            );
+
             const newFileName = FileSystem.documentDirectory + key + '.jpg';
-            let fileCopyResult = await FileSystem.copyAsync({from: element.file,to: newFileName});
-            let res = await FileSystem.readAsStringAsync(newFileName, {encoding: FileSystem.EncodingType.Base64});
+            let fileCopyResult = await FileSystem.copyAsync({from: newElement.uri,to: newFileName});
+            let res = await FileSystem.readAsStringAsync(newFileName, {encoding: FileSystem.EncodingType.Base64});            
+            
             const fileToUpload = {b64: res, mimeType: this.state.assetType == 'Photos' ? 'image/jpeg' : 'video/mp4'};
             let  uploadResult = await OkulApi.uploadImageFile(fileToUpload, Platform);
               if (uploadResult != null && uploadResult.fileId != null) {

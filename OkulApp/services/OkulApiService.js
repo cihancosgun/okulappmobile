@@ -16,6 +16,7 @@ export class OkulApi extends React.Component {
     static serverWSProtocol = 'ws://';
     // static serverIP = '192.168.2.2';
     // static serverIP = '172.16.121.31';
+     //static serverIP = '192.168.134.36';
     static serverIP = 'app.bilgiyuvamanaokulu.com';
     // static serverPort = ':8080';
     static serverPort = '';
