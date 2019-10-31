@@ -69,20 +69,23 @@ export class NotificationScreen extends React.Component {
       }else{
         this.setState({
           isFilesUploading:true,
+           status:'Resimler karşı tarafa yükleniyor. (1 / '+photos.length+')'
         });
         for (const key in photos) {
           if (photos.hasOwnProperty(key)) {
             const element = photos[key];
-            //resize image in here
+            
             const newElement = await ImageManipulator.manipulateAsync(
               element.file,
-              [{ resize: {width : 1024, height: 768} }],
-              { compress: 1, format: ImageManipulator.SaveFormat.JPEG, base64: false }
+              [{ resize: {width : 1024} }],
+              { compress: 0.5, format: ImageManipulator.SaveFormat.JPEG, base64: false }
             );
+            
+            
 
-            const newFileName = FileSystem.documentDirectory + key + '.jpg';
-            let fileCopyResult = await FileSystem.copyAsync({from: newElement.uri,to: newFileName});
-            let res = await FileSystem.readAsStringAsync(newFileName, {encoding: FileSystem.EncodingType.Base64});            
+            // const newFileName = FileSystem.documentDirectory + key + '.jpg';
+            // let fileCopyResult = await FileSystem.copyAsync({from: newElement.uri,to: newFileName});
+             let res = await FileSystem.readAsStringAsync(newElement.uri, {encoding: FileSystem.EncodingType.Base64});            
             
             const fileToUpload = {b64: res, mimeType: this.state.assetType == 'Photos' ? 'image/jpeg' : 'video/mp4'};
             let  uploadResult = await OkulApi.uploadImageFile(fileToUpload, Platform);
@@ -91,9 +94,10 @@ export class NotificationScreen extends React.Component {
                 this.state.thumbFileIds.push(uploadResult.thumbFileId);                
                 newList.push(element);
                 this.state.photos = newList;
-                this.state.isFilesUploading = key < (photos.length-1);
+                this.state.isFilesUploading = key < (photos.length-1);      
+                this.state.status = 'Resimler karşı tarafa yükleniyor. ('+(parseInt(key) +1)+' / '+photos.length+')';
                 this.setState(this.state);
-                await FileSystem.deleteAsync(newFileName);
+                await FileSystem.deleteAsync(newElement.uri);
               }
           }
         }
@@ -182,7 +186,7 @@ export class NotificationScreen extends React.Component {
   }
  
   render() {    
-    if (this.state == null || this.state.isSending) {
+    if (this.state == null || this.state.isSending || this.state.isFilesUploading) {
       return (
         <View style={[styles.container, styles.horizontal]}>
           <ActivityIndicator size="large" color="#0000ff" />
