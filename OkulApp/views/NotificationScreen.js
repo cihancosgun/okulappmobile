@@ -43,14 +43,15 @@ export class NotificationScreen extends React.Component {
     title: 'Duyuru / Etkinlik / Hatırlatma',
   };
 
-  async componentDidMount() { 
-        
+  async componentDidMount() {         
     Permissions.askAsync(Permissions.CAMERA_ROLL).then(d => console.log(d));
   }
 
   back() {
     this.props.navigation.navigate('Menu');
   }
+
+  
 
   imageBrowserCallback = async (callback) => {
     let photos = await callback;
@@ -59,48 +60,28 @@ export class NotificationScreen extends React.Component {
     });
 
     if(photos != null) {
-      let newList = this.state.photos;
-      if(photos.length == 0){
+      let newList = photos;
+      if(photos.length > 0){
         this.setState({
           imageBrowserOpen: false,
           photos:newList,
           isFilesUploading:false,
         });
-      }else{
-        this.setState({
-          isFilesUploading:true,
-           status:'Resimler karşı tarafa yükleniyor. (1 / '+photos.length+')'
-        });
+        let fileToUploads = [];
         for (const key in photos) {
           if (photos.hasOwnProperty(key)) {
-            const element = photos[key];
-            
+            const element = photos[key];            
             const newElement = await ImageManipulator.manipulateAsync(
               element.file,
               [{ resize: {width : 1024} }],
               { compress: 0.5, format: ImageManipulator.SaveFormat.JPEG, base64: false }
             );
-            
-            
-
-            // const newFileName = FileSystem.documentDirectory + key + '.jpg';
-            // let fileCopyResult = await FileSystem.copyAsync({from: newElement.uri,to: newFileName});
-             let res = await FileSystem.readAsStringAsync(newElement.uri, {encoding: FileSystem.EncodingType.Base64});            
-            
-            const fileToUpload = {b64: res, mimeType: this.state.assetType == 'Photos' ? 'image/jpeg' : 'video/mp4'};
-            let  uploadResult = await OkulApi.uploadImageFile(fileToUpload, Platform);
-              if (uploadResult != null && uploadResult.fileId != null) {
-                this.state.fileIds.push(uploadResult.fileId);
-                this.state.thumbFileIds.push(uploadResult.thumbFileId);                
-                newList.push(element);
-                this.state.photos = newList;
-                this.state.isFilesUploading = key < (photos.length-1);      
-                this.state.status = 'Resimler karşı tarafa yükleniyor. ('+(parseInt(key) +1)+' / '+photos.length+')';
-                this.setState(this.state);
-                await FileSystem.deleteAsync(newElement.uri);
-              }
+            let res = await FileSystem.readAsStringAsync(newElement.uri, {encoding: FileSystem.EncodingType.Base64});                        
+            const fileToUpload = {b64: res, uri:newElement.uri, mimeType: this.state.assetType == 'Photos' ? 'image/jpeg' : 'video/mp4'};
+            fileToUploads.push(fileToUpload);
           }
         }
+        this.setState({"fileToUploads" : fileToUploads});
       }
 
     }   
@@ -157,7 +138,7 @@ export class NotificationScreen extends React.Component {
     this.setState({notifyReceiverOpen:true});
   }
 
-  sendNotify(){
+  sendNotify = async (callback) => {
     if(this.state.receivers.length == 0){
       Alert.alert('HATA', 'Alıcı seçiniz.');
       return;
@@ -165,24 +146,36 @@ export class NotificationScreen extends React.Component {
     if(this.state.message.length == 0){
       Alert.alert('HATA', 'Mesaj yazınız.');
       return;
-    }
-    this.setState({isSending:true, status: 'Gönderiliyor..'});
-
-    OkulApi.insertNotifyMessage(this.state, (res)=>{
-      this.setState({isSending:false});
-      Alert.alert('Başarılı', 'Duyuru gönderildi.');
-      this.props.navigation.navigate('Menu');
-    },(error)=>{
-      Alert.alert('Hata', 'Duyuru gönderilirken bir hata oluştu.');
-    });
-
-
-    for (const key in this.state.photos) {
-      if (this.state.photos.hasOwnProperty(key)) {
-        const element = this.state.photos[key];               
-        
-      }
-    }
+    }         
+     if(this.state.fileToUploads != null && this.state.fileToUploads.length > 0){
+      this.setState({
+        isFilesUploading:true,
+         status:'Resimler karşı tarafa yükleniyor...'
+      });    
+        this.state.fileIds = [];
+        this.state.thumbFileIds = [];
+        for (const key in this.state.fileToUploads) {          
+          if (this.state.fileToUploads.hasOwnProperty(key)) {
+                let fileToUpload = this.state.fileToUploads[key];                
+                let uploadResult = await OkulApi.uploadImageFile(fileToUpload, Platform);              
+                  if (uploadResult != null && uploadResult.fileId != null) {
+                    this.state.fileIds.push(uploadResult.fileId);
+                    this.state.thumbFileIds.push(uploadResult.thumbFileId);
+                    this.state.isFilesUploading = key < (this.state.fileToUploads.length-1);
+                    this.setState(this.state);
+                    await FileSystem.deleteAsync(fileToUpload.uri);
+                  }                         
+          }
+        }  
+     }
+      this.setState({isSending:true, isFilesUploading:false, status: 'Gönderiliyor..'});
+      OkulApi.insertNotifyMessage(this.state, (res)=>{
+        this.setState({isSending:false});
+        Alert.alert('Başarılı', 'Duyuru gönderildi.');
+        this.props.navigation.navigate('Menu');
+      },(error)=>{
+        Alert.alert('Hata', 'Duyuru gönderilirken bir hata oluştu.');
+      });  
   }
  
   render() {    
