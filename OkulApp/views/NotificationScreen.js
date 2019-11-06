@@ -73,8 +73,8 @@ export class NotificationScreen extends React.Component {
             const element = photos[key];            
             const newElement = await ImageManipulator.manipulateAsync(
               element.file,
-              [{ resize: {width : 1024} }],
-              { compress: 0.5, format: ImageManipulator.SaveFormat.JPEG, base64: false }
+              [{ resize: {width : 1920} }],
+              { compress: 0.8, format: ImageManipulator.SaveFormat.JPEG, base64: false }
             );
             let res = await FileSystem.readAsStringAsync(newElement.uri, {encoding: FileSystem.EncodingType.Base64});                        
             const fileToUpload = {b64: res, uri:newElement.uri, mimeType: this.state.assetType == 'Photos' ? 'image/jpeg' : 'video/mp4'};
