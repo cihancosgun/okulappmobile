@@ -3,13 +3,13 @@ import {
   StyleSheet,
   Text,
   View,
-  CameraRoll,
   FlatList,
   Dimensions,
   Button
 } from 'react-native';
 import * as FileSystem from 'expo-file-system';
 import ImageTile from './ImageTile';
+import * as MediaLibrary from 'expo-media-library';
 const { width } = Dimensions.get('window')
 
 export default class ImageBrowser extends React.Component {
@@ -24,6 +24,13 @@ export default class ImageBrowser extends React.Component {
   }
 
   componentDidMount() {
+
+    MediaLibrary.getPermissionsAsync().then(function(permCheck){
+      if(!permCheck.granted){
+        MediaLibrary.requestPermissionsAsync();
+      }
+    });    
+
     this.getPhotos()
   }
 
@@ -40,21 +47,21 @@ export default class ImageBrowser extends React.Component {
   }
 
   getPhotos = () => {
-    let params = { first: 50, assetType : this.props.assetType};
+    let params = { first: 50, sortBy:[[ MediaLibrary.SortBy.creationTime, false ]], mediaType : [ MediaLibrary.MediaType.photo ]};
     if (this.state.after) params.after = this.state.after
     if (!this.state.has_next_page) return
-    CameraRoll    
-      .getPhotos(params)      
+    MediaLibrary    
+      .getAssetsAsync(params)      
       .then(this.processPhotos)
   }
 
   processPhotos = (r) => {
-    if (this.state.after === r.page_info.end_cursor) return;  
-    let uris = r.edges.map(i=> i.node).map(i=> i.image).map(i=>i.uri)
+    if (this.state.after === r.endCursor) return;  
+    let uris = r.assets.map(i=>i.uri)
     this.setState({
       photos: [...this.state.photos, ...uris],
-      after: r.page_info.end_cursor,
-      has_next_page: r.page_info.has_next_page
+      after: r.endCursor,
+      has_next_page: r.hasNextPage
     });
   }
 

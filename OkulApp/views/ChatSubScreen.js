@@ -74,6 +74,7 @@ export class ChatSubScreen extends React.Component {
       <View key={Math.random()} style={message.senderEmail == OkulApi.userName ? styles.messageSend : styles.messageReceive}>
         <Text>{message.message}</Text>
         <Text note>{Moment(new Date(message.sendingTime.$date)).format('DD.MM.YYYY HH:mm:ss')}</Text>
+        <Text note>{message.readed ? 'Okundu' : 'İletildi'}</Text>
       </View>);
     setTimeout(() => {
       this.myScrollToEnd();
