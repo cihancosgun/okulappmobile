@@ -138,23 +138,17 @@ export class NotificationScreen extends React.Component {
     this.setState({notifyReceiverOpen:true});
   }
 
-  sendNotify = async (callback) => {
-    if(this.state.receivers.length == 0){
-      Alert.alert('HATA', 'Alıcı seçiniz.');
-      return;
-    }
-    if(this.state.message.length == 0){
-      Alert.alert('HATA', 'Mesaj yazınız.');
-      return;
-    }         
-     if(this.state.fileToUploads != null && this.state.fileToUploads.length > 0){
+
+  uploadFiles = async () =>{
+    console.log("Files uploading..");
+    if(this.state.fileToUploads != null && this.state.fileToUploads.length > 0){
       this.setState({
         isFilesUploading:true,
          status:'Resimler karşı tarafa yükleniyor...'
       });    
         this.state.fileIds = [];
         this.state.thumbFileIds = [];
-        for (const key in this.state.fileToUploads) {          
+        for (const key in this.state.fileToUploads) {
           if (this.state.fileToUploads.hasOwnProperty(key)) {
                 let fileToUpload = this.state.fileToUploads[key];                
                 let uploadResult = await OkulApi.uploadImageFile(fileToUpload, Platform);              
@@ -168,14 +162,49 @@ export class NotificationScreen extends React.Component {
           }
         }  
      }
+     console.log("Files uploaded..");
+  };
+
+  insertNotifyMessage = async () =>{
+    console.log("Notify message inserting..");
       this.setState({isSending:true, isFilesUploading:false, status: 'Gönderiliyor..'});
       OkulApi.insertNotifyMessage(this.state, (res)=>{
         this.setState({isSending:false});
         Alert.alert('Başarılı', 'Duyuru gönderildi.');
         this.props.navigation.navigate('Menu');
-      },(error)=>{
-        Alert.alert('Hata', 'Duyuru gönderilirken bir hata oluştu.');
-      });  
+    },(error)=>{
+      Alert.alert('Hata', 'Duyuru gönderilirken bir hata oluştu.');
+    });  
+    console.log("Notify message inserted..");
+  };
+
+  sendNotify = async (callback) => {
+    if(this.state.receivers.length == 0){
+      Alert.alert('HATA', 'Alıcı seçiniz.');
+      return;
+    }
+    if(this.state.message.length == 0){
+      Alert.alert('HATA', 'Mesaj yazınız.');
+      return;
+    } 
+    if(this.state.fileToUploads == null || this.state.fileToUploads == undefined || this.state.fileToUploads.length == 0){
+      Alert.alert(
+        'Resim Seçiniz',
+        'DİKKAT : Resim seçimi yapmadınız.',
+        [
+          { text: 'Resim Seç', onPress: () => { return; } },
+          {
+            text: 'Resimsiz Duyuru Gönder',
+            onPress: async () => { await this.insertNotifyMessage(); } ,
+            style: 'cancel',
+          }
+        ],
+        { cancelable: false }
+      );
+    }else{
+      await this.uploadFiles();
+      await this.insertNotifyMessage();
+    }
   }
  
   render() {    
