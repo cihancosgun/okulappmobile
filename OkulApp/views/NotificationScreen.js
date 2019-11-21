@@ -68,12 +68,17 @@ export class NotificationScreen extends React.Component {
           isFilesUploading:false,
         });
         let fileToUploads = [];
+        this.setState({
+          isFilesUploading:true,
+           status:'Resimler hazırlanıyor...'
+        });
+
         for (const key in photos) {
           if (photos.hasOwnProperty(key)) {
             const element = photos[key];            
             const newElement = await ImageManipulator.manipulateAsync(
               element.file,
-              [{ resize: {width : 1920} }],
+              [{ resize: {width : 1280} }],
               { compress: 0.8, format: ImageManipulator.SaveFormat.JPEG, base64: false }
             );
             let res = await FileSystem.readAsStringAsync(newElement.uri, {encoding: FileSystem.EncodingType.Base64});                        
@@ -81,7 +86,8 @@ export class NotificationScreen extends React.Component {
             fileToUploads.push(fileToUpload);
           }
         }
-        this.setState({"fileToUploads" : fileToUploads});
+
+        this.setState({isFilesUploading:false, status:"", fileToUploads : fileToUploads});
       }
 
     }   
