@@ -9,7 +9,7 @@ import {
   Image,
   Alert, KeyboardAvoidingView, AsyncStorage
 } from 'react-native';
-import Gallery from 'react-native-image-gallery';
+import SmartGallery from "react-native-smart-gallery";
 import { OkulApi } from '../services/OkulApiService';
 import { Toast} from 'native-base';
 import * as MediaLibrary from 'expo-media-library';
@@ -66,10 +66,17 @@ export class GalleryScreen extends React.Component {
   render() {
     return (
       <View style={{ flex: 1, backgroundColor:'white'}}>
-         <Gallery ref={component => this._myGallery = component} key="myGallery" initialPage={OkulApi.imageGalleryIndex}
+         <SmartGallery ref={component => this._myGallery = component} key="myGallery" index={OkulApi.imageGalleryIndex}
             style={{ flex: 1, backgroundColor: 'black' }}
               images={OkulApi.imageGallery}
               onPageScroll={(event)=>{ if(event != null) { this.setState({position: event.position}); }}}
+               // Change this to render how many items before and after it.
+              loadMinimal={true}
+              loadMinimalSize={2}
+              // Turning this off will make it feel faster
+              // and prevent the scroller to slow down
+              // on fast swipes.
+              sensitiveScroll={false}
           />
         <Text>{ this.state != null && this.state.position != null ? this.state.position+1 : ''} / {OkulApi.imageGallery.length}</Text>
         <View style={styles.fixToText}>
