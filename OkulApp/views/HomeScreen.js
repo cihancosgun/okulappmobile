@@ -173,7 +173,7 @@ export class HomeScreen extends React.Component {
   }
  
   renderImageItem(data,thiz){
-    return (<View><TouchableHighlight onPress={() => thiz.showPrepearedGallery(thiz, data.index)}><Image source={data.item.source} style={{width:width/2,height:150}} /></TouchableHighlight></View>);
+    return (<View><TouchableHighlight onPress={()=>thiz.showPrepearedGallery(thiz, data.index)}><Image source={data.item.source} style={{width:width/2,height:150}} /></TouchableHighlight></View>);
   }
   
   render() {    
@@ -187,7 +187,7 @@ export class HomeScreen extends React.Component {
       return(
         <View style={{flex:1, backgroundColor:'white', marginTop:30}}>
           <FlatList 
-            data={OkulApi.imageGallery} 
+            data={OkulApi.imageGallery}  
             renderItem={(item)=>this.renderImageItem(item , this)} 
             keyExtractor={(_,idx)=>idx} numColumns={2} />
           <Button

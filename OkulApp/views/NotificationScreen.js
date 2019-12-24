@@ -36,6 +36,7 @@ export class NotificationScreen extends React.Component {
       thumbFileIds : [],
       status:'',
       isFilesUploading:false,
+      fileToUploads:[]
     }
   }
 
@@ -65,28 +66,24 @@ export class NotificationScreen extends React.Component {
         this.setState({
           imageBrowserOpen: false,
           photos:newList,
-          isFilesUploading:false,
+          isFilesUploading:true,
+          status:'Resimler hazırlanıyor...'
         });
         let fileToUploads = [];
-        this.setState({
-          isFilesUploading:true,
-           status:'Resimler hazırlanıyor...'
-        });
-
-        for (const key in photos) {
+        for (let key in photos) {
           if (photos.hasOwnProperty(key)) {
-            const element = photos[key];            
-            const newElement = await ImageManipulator.manipulateAsync(
+            let element = photos[key];            
+            let newElement = await ImageManipulator.manipulateAsync(
               element.file,
               [{ resize: {width : 1280} }],
               { compress: 0.8, format: ImageManipulator.SaveFormat.JPEG, base64: false }
             );
             let res = await FileSystem.readAsStringAsync(newElement.uri, {encoding: FileSystem.EncodingType.Base64});                        
-            const fileToUpload = {b64: res, uri:newElement.uri, mimeType: this.state.assetType == 'Photos' ? 'image/jpeg' : 'video/mp4'};
+            let fileToUpload = {b64: res, uri:newElement.uri, mimeType: this.state.assetType == 'Photos' ? 'image/jpeg' : 'video/mp4'};
             fileToUploads.push(fileToUpload);
+            await FileSystem.deleteAsync(newElement.uri);
           }
         }
-
         this.setState({isFilesUploading:false, status:"", fileToUploads : fileToUploads});
       }
 
@@ -162,8 +159,7 @@ export class NotificationScreen extends React.Component {
                     this.state.fileIds.push(uploadResult.fileId);
                     this.state.thumbFileIds.push(uploadResult.thumbFileId);
                     this.state.isFilesUploading = key < (this.state.fileToUploads.length-1);
-                    this.setState(this.state);
-                    await FileSystem.deleteAsync(fileToUpload.uri);
+                    this.setState(this.state);                    
                   }                         
           }
         }  
@@ -270,7 +266,7 @@ export class NotificationScreen extends React.Component {
 
             <Text note>Galeri</Text>
             <Item>
-            <Text>{this.state.photos.length} adet resim seçili.   </Text>
+            <Text>{this.state.fileToUploads.length} adet resim seçili.   </Text>
               <Button rounded onPress={() => {this.setState({imageBrowserOpen: true, assetType:'Photos'})}}>
                   <Text>Seç</Text>
               </Button>

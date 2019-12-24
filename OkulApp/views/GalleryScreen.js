@@ -66,7 +66,7 @@ export class GalleryScreen extends React.Component {
   render() {
     return (
       <View style={{ flex: 1, backgroundColor:'white'}}>
-         <Gallery key="myGallery" initialPage={OkulApi.imageGalleryIndex}
+         <Gallery ref={component => this._myGallery = component} key="myGallery" initialPage={OkulApi.imageGalleryIndex}
             style={{ flex: 1, backgroundColor: 'black' }}
               images={OkulApi.imageGallery}
               onPageScroll={(event)=>{ if(event != null) { this.setState({position: event.position}); }}}
